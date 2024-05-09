@@ -1,0 +1,49 @@
+---
+title: "Untitled"
+author: "girl squad"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidycensus)
+library(dplyr)
+
+```
+
+
+```{r}
+
+bmore_hhinc12 <- get_acs(
+  geography = "tract", 
+  variables = "B19013_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2012,
+  geometry = TRUE 
+) %>%
+  select(GEOID, estimate) %>%
+  rename(est12 = estimate)
+
+bmore_medhhinc12 <- bmore_hhinc12 %>%
+  
+
+bmore_hhinc22 <- get_acs(
+  geography = "tract", 
+  variables = "B19013_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = FALSE 
+) %>%
+  select(GEOID, estimate) %>%
+  rename(est22 = estimate)
+
+bmore_hhinc_change <- left_join(bmore_hhinc12, bmore_hhinc22, by = "GEOID")
+
+
+
+```
+
