@@ -17,14 +17,18 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-library(tidycensus)
 library(dplyr)
+library(sf)
+library(stats)
+library(tidycensus)
+library(tidyr)
 
 ```
 
 
 ```{r genindex, warning=FALSE, message=FALSE}
 
+#Calculate 80% of median household income for 2012
 bmore_hhinc12 <- get_acs(
   geography = "tract", 
   variables = "B19013_001",
@@ -36,9 +40,15 @@ bmore_hhinc12 <- get_acs(
   select(GEOID, estimate) %>%
   rename(est12 = estimate)
 
-bmore_medhhinc12 <- bmore_hhinc12 %>%
-  summarise(med(est12))
+bmore_80medhhinc12 <- bmore_hhinc12 %>%
+  na.omit() %>%
+  summarise(med12 = median(est12)) %>%
+  st_drop_geometry()
 
+bmore_80medhhinc12 <- bmore_80medhhinc12[[1,1]]
+bmore_80medhhinc12 = (bmore_80medhhinc12 * .80)
+
+#Calculate 80% of median household income for 2022
 bmore_hhinc22 <- get_acs(
   geography = "tract", 
   variables = "B19013_001",
@@ -50,7 +60,56 @@ bmore_hhinc22 <- get_acs(
   select(GEOID, estimate) %>%
   rename(est22 = estimate)
 
-bmore_hhinc_change <- left_join(bmore_hhinc12, bmore_hhinc22, by = "GEOID")
+bmore_80medhhinc22 <- bmore_hhinc22 %>%
+  na.omit() %>%
+  summarise(med12 = median(est22)) %>%
+  st_drop_geometry()
+
+bmore_80medhhinc22 <- bmore_80medhhinc22[[1,1]]
+bmore_80medhhinc22 = (bmore_80medhhinc22 * .80)
+
+#Determine proportion of the population per ct that is Low and High income
+bmore_ctmedhhinc12 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B19001_001", 
+                L = "B19001_002", L = "B19001_003", L = "B19001_004", L = "B19001_005", L = "B19001_006",
+                H = "B19001_007", H = "B19001_008", H = "B19001_009", H = "B19001_010", H = "B19001_011", 
+                H = "B19001_012", H = "B19001_013", H = "B19001_014", H = "B19001_015", H = "B19001_016", 
+                H = "B19001_017"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2012,
+  geometry = FALSE 
+) %>%
+  select(GEOID, variable, estimate) %>%
+  rename(est12 = estimate, var12 = variable) %>%
+  group_by(GEOID, var12) %>%
+  summarise(est12 = sum(est12)) %>%
+  pivot_wider(names_from = var12, values_from = est12) %>%
+  mutate(pH12 = H/tot, pL12 = L/tot)
+
+bmore_ctmedhhinc22 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B19001_001", 
+                L = "B19001_002", L = "B19001_003", L = "B19001_004", L = "B19001_005", L = "B19001_006",
+                H = "B19001_007", H = "B19001_008", H = "B19001_009", H = "B19001_010", H = "B19001_011", 
+                H = "B19001_012", H = "B19001_013", H = "B19001_014", H = "B19001_015", H = "B19001_016", 
+                H = "B19001_017"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = FALSE 
+) %>%
+  select(GEOID, variable, estimate) %>%
+  rename(est22 = estimate, var22 = variable) %>%
+  group_by(GEOID, var22) %>%
+  summarise(est22 = sum(est22)) %>%
+  pivot_wider(names_from = var22, values_from = est22) %>%
+  mutate(pH22 = H/tot, pL22 = L/tot)
+
+bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
+  select(GEOID, pH12, pH22, pL12, pL22) %>%
+  mutate(genindex = (pH22 - pH12) - (pL22 - pL12))
 
 
 
