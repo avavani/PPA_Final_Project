@@ -107,11 +107,12 @@ bmore_ctmedhhinc22 <- get_acs(
   pivot_wider(names_from = var22, values_from = est22) %>%
   mutate(pH22 = H/tot, pL22 = L/tot)
 
+#Calculate gentrification index
 bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
   select(GEOID, pH12, pH22, pL12, pL22) %>%
   mutate(genindex = (pH22 - pH12) - (pL22 - pL12))
 
-
+#Check for proportion of residents who moved in prior to 2012?
 
 ```
 
