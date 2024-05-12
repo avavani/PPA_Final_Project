@@ -129,11 +129,31 @@ bmore_genindex <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID"
 
 #Label CT based on whether they have or have not gentrified
 bmore_genindex <- bmore_genindex %>%
-  mutate(normal = (genindex + 1)/2) %>%
+  mutate(normal = (genindex + 1)/2)
+
+bmore_genindex <- bmore_genindex %>%
   mutate(gent = case_when(normal >= (quantile(bmore_genindex$normal, probs = c(0.75), na.rm = TRUE)) ~ "Gentrified", TRUE ~ 'Not Gentrified'))
 
-#Check for proportion of residents who moved in prior to 2012?
+#Check for proportion of residents who moved in prior to 2010? Owner Occupied?
+bmore_ctyomi <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B25038_002", 
+                new = "B25038_003", new = "B25038_004", new = "B25038_005",
+                old = "B25038_006", old = "B25038_007", old = "B25038_008"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = FALSE 
+) %>%
+  select(GEOID, variable, estimate) %>%
+  group_by(GEOID, variable) %>%
+  summarise(estimate = sum(estimate)) %>%
+  pivot_wider(names_from = variable, values_from = estimate) %>%
+  mutate(pcentnew = new/tot) %>%
+  mutate(oldnew = case_when(pcentnew >= 0.6 ~ "Majority New", TRUE ~ "Majority Old")) %>%
+  select(GEOID, oldnew)
 
+bmore_genindex <- left_join(bmore_genindex, bmore_ctyomi, by = "GEOID")
 
 ```
 
@@ -157,7 +177,7 @@ bmore_genindex_sf <- left_join(bmore_ctgeo, bmore_genindex, by = "GEOID")
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = bmore_genindex_sf, aes(fill = genindex), col = "transparent") +
+  geom_sf(data = bmore_genindex_sf, aes(fill = normal), col = "transparent") +
   scale_fill_gradient(
     high = "orangered4",
     low = "lightgoldenrod1") +
@@ -172,3 +192,56 @@ ggplot() +
 #"firebrick4", "darkgoldenrod", "darkolivegreen", "royalblue4", "mediumpurple4"
 
 ```
+```{r bmorebase_data, warning=FALSE, message=FALSE}
+
+#2022 Median Household Income
+bmore_hhinc22 <- get_acs(
+  geography = "tract", 
+  variables = "B19013_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = FALSE 
+) %>%
+  select(GEOID, estimate)
+
+#2022 Majority Non-White
+
+#2022 Majority Owner
+
+#2022 Median Home Value
+
+#2022 Median Rent
+
+
+```
+
+```{r bmorebase_map, warning=FALSE, message=FALSE}
+
+#2022 Median Household Income
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_hhinc22, aes(fill = estimate), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1") +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Median Household Income",
+       title = "2022 Median Household Income",
+       subtitle = "Baltimore City, MD")
+
+#2022 Majority Non-White
+
+#2022 Majority Owner
+
+#2022 Median Home Value
+
+#2022 Median Rent
+
+
+```
+
