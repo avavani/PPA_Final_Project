@@ -214,16 +214,16 @@ all.acs <- all.acs %>%
     NChangeInHighIncPct = ChangeInHighIncPct / max(abs(ChangeInHighIncPct), na.rm = TRUE),
     NChangeInLowIncPct = ChangeInLowIncPct / max(abs(ChangeInLowIncPct), na.rm = TRUE)
   )%>%
-  mutate(genindex = (0.5*NHHIncChangeper) + (0.5*NChangeInHighIncPct) - NChangeInLowIncPct)%>%
-  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.2, na.rm = TRUE)))~ 1,
+  mutate(genindex = NChangeInHighIncPct - (NChangeInLowIncPct))%>%
+  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.75, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
 Now joining to Shape file
 
 ```{r}
 baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
-all.acs <- left_join(baltimore_tracts, all.acs, by = "GEOID")
+all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 
-tm_shape(all.acs)+
+tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
