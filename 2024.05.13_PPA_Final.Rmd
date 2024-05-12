@@ -20,7 +20,7 @@ library(pacman)
 p_load(dplyr,sf,stats,tidycensus,tidyr, mapview, tigris,tmap)
 ```
 
-```{r geography, include=FALS, message=FALSE, warning=FALSE}
+```{r callingacsdata, include=FALS, message=FALSE, warning=FALSE}
 #Getting my ACS Variable LIst
 acs_variable_list.2012 <- load_variables(2012, 
                                          "acs5", 
@@ -139,7 +139,7 @@ all.acs <- bmore_acs12 %>%
 
 Now we are working on getting our gentrification index. First, we want to calculate the percentage of low and high income people for census tracts in both years.
 
-```{r}
+```{r callingincomedata}
 #Getting population by Income numbers
 bmore_ctmedhhinc12 <- get_acs(
   geography = "tract", 
@@ -197,7 +197,7 @@ bmore_ctmedhhinc22 <- get_acs(
 ```
 Now that the data is ready getting it in my index
 
-```{r}
+```{r makingindex}
 #joining all
 bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
   select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
@@ -220,7 +220,7 @@ all.acs <- all.acs %>%
 ```
 Now joining to Shape file
 
-```{r}
+```{r joiningviz1}
 baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
 all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 
