@@ -219,6 +219,17 @@ bmore_nonwhite22 <- get_acs(
   mutate(nonwhite = 1 - (white/tot))
 
 #2022 Majority Owner
+bmore_pcentoo22 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B25003_001", oo = "B25003_002", ro = "B25003_003"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE
+) %>%
+  select(GEOID, variable, estimate) %>%
+  pivot_wider(names_from = variable, values_from = estimate) %>%
+  mutate(propoo = (oo/tot))
 
 #2022 Median Home Value
 
@@ -264,8 +275,24 @@ ggplot() +
        subtitle = "Baltimore City, MD")
 
 #2022 Majority Owner
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_pcentoo22, aes(fill = propoo), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1",
+    labels = scales::percent) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Percent Owner-Occupied",
+       title = "2022 Tenure",
+       subtitle = "Baltimore City, MD")
 
 #2022 Median Home Value
+
 
 #2022 Median Rent
 
