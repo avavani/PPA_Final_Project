@@ -21,8 +21,6 @@ p_load(dplyr,sf,stats,tidycensus,tidyr, mapview, tigris,tmap)
 ```
 
 ```{r geography, include=FALS, message=FALSE, warning=FALSE}
-
-```{r genindex, warning=FALSE, message=FALSE}
 #Getting my ACS Variable LIst
 acs_variable_list.2012 <- load_variables(2012, 
                                          "acs5", 
@@ -213,7 +211,7 @@ all.acs <- all.acs %>%
     NChangeInHighIncPct = ChangeInHighIncPct / max(abs(ChangeInHighIncPct), na.rm = TRUE),
     NChangeInLowIncPct = ChangeInLowIncPct / max(abs(ChangeInLowIncPct), na.rm = TRUE)
   )%>%
-  mutate(genindex = NHHIncChangeper + NChangeInHighIncPct + NChangeInLowIncPct)%>%
+  mutate(genindex = (0.5*NHHIncChangeper) + (0.5*NChangeInHighIncPct) - NChangeInLowIncPct)%>%
   mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.3, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
