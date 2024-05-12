@@ -227,9 +227,9 @@ all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
-<<<<<<< HEAD
 
-<<<<<<< HEAD
+
+
 ```{r bmore_data, message=FALSE, warning=FALSE}
 #Vacant lots 
 bmore_lots <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/1/query?outFields=*&where=1%3D1&f=geojson")
@@ -248,12 +248,11 @@ bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/
 bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
 
 ```
-=======
+
 ## Visualization
 
 ## Moving to Modelling
->>>>>>> fbe6223dd9b9a60d41998c1a607b4e9edb9cce81
-=======
+
 ## Visualization
 
 ## Moving to Modelling
@@ -401,4 +400,4 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
         plot.caption = element_text(size = 8))
 ```
 
->>>>>>> 6903138511535774f4fddc4df327055656588ac0
+
