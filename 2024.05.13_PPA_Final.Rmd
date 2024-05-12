@@ -201,11 +201,22 @@ bmore_hhinc22 <- get_acs(
   state = "MD", 
   county = "Baltimore City",
   year = 2022,
-  geometry = FALSE 
+  geometry = TRUE 
 ) %>%
   select(GEOID, estimate)
 
 #2022 Majority Non-White
+bmore_nonwhite22 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B03002_001", white = "B03002_003"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE
+) %>%
+  select(GEOID, variable, estimate) %>%
+  pivot_wider(names_from = variable, values_from = estimate) %>%
+  mutate(nonwhite = 1 - (white/tot))
 
 #2022 Majority Owner
 
@@ -225,7 +236,8 @@ ggplot() +
   geom_sf(data = bmore_hhinc22, aes(fill = estimate), col = "transparent") +
   scale_fill_gradient(
     high = "orangered4",
-    low = "lightgoldenrod1") +
+    low = "lightgoldenrod1",
+    labels = scales::dollar) +
   theme_void() +
   xlim(-76.75, -76.48) +
   ylim(39.2, 39.38) +
@@ -235,6 +247,21 @@ ggplot() +
        subtitle = "Baltimore City, MD")
 
 #2022 Majority Non-White
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_nonwhite22, aes(fill = nonwhite), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1",
+    labels = scales::percent) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Percent Non-White",
+       title = "2022 Race/Ethnicity",
+       subtitle = "Baltimore City, MD")
 
 #2022 Majority Owner
 
