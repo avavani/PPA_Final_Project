@@ -1,37 +1,37 @@
 
 Regression Results
-==========================================================
-                                  Dependent variable:     
-                             -----------------------------
-                                       gentrify           
-----------------------------------------------------------
-TotalPopulation12               0.0004 (-0.002, 0.003)    
-TotalHousingUnits12              0.001 (-0.003, 0.005)    
-VacantHousingUnits12            -0.003 (-0.008, 0.002)    
-MedianHouseholdIncome12       -0.00005 (-0.0001, 0.00002) 
-WhiteAlone12                    0.0003 (-0.001, 0.001)    
-GradProfessionalDegree12         0.001 (-0.003, 0.005)    
-MovedWithinCounty12            -0.005* (-0.009, -0.001)   
-MovedFromSameState12             0.007* (0.001, 0.013)    
-MovedFromDifferentState12       -0.008 (-0.017, 0.001)    
-MovedAbroad12                   -0.007 (-0.026, 0.013)    
-BachelorsDegree12               0.0002 (-0.005, 0.005)    
-OwnerOccupiedHouseholdSize12    -0.423 (-1.379, 0.533)    
-RenterOccupiedSize12             0.647 (-0.475, 1.769)    
-FamilyHouseholds12              -0.005 (-0.012, 0.003)    
-NonFamilyHouseholds12                                     
-MedianRent12                    0.003 (-0.0001, 0.006)    
-MedianHomeValue12             0.00001* (0.00000, 0.00002) 
-inflation.adjHH12                                         
-percentHighInc12                -6.318 (-12.718, 0.082)   
-percentLowInc12                                           
-Constant                         0.719 (-4.439, 5.878)    
-----------------------------------------------------------
-Observations                              148             
-Log Likelihood                          -55.797           
-Akaike Inf. Crit.                       147.594           
-==========================================================
-Significance levels:         *p<0.05; **p<0.01; ***p<0.001
-                             *** p<0.001                  
-                             ** p<0.01                    
-                             * p<0.05                     
+================================================================
+                                     Dependent variable:        
+                             -----------------------------------
+                                          gentrify              
+----------------------------------------------------------------
+TotalPopulation12                 0.000 (-222.235, 222.235)     
+TotalHousingUnits12               0.000 (-485.529, 485.529)     
+VacantHousingUnits12             -0.000 (-658.037, 658.037)     
+MedianHouseholdIncome12             0.000 (-7.794, 7.794)       
+WhiteAlone12                     -0.000 (-103.425, 103.425)     
+GradProfessionalDegree12         -0.000 (-395.077, 395.077)     
+MovedWithinCounty12              -0.000 (-386.443, 386.443)     
+MovedFromSameState12             -0.000 (-799.329, 799.329)     
+MovedFromDifferentState12        -0.000 (-886.264, 886.264)     
+MovedAbroad12                   0.000 (-1,471.839, 1,471.839)   
+BachelorsDegree12                 0.000 (-599.018, 599.018)     
+OwnerOccupiedHouseholdSize12  0.000 (-127,488.500, 127,488.500) 
+RenterOccupiedSize12          0.000 (-146,915.500, 146,915.500) 
+FamilyHouseholds12               -0.000 (-813.655, 813.655)     
+NonFamilyHouseholds12                                           
+MedianRent12                     -0.000 (-363.844, 363.844)     
+MedianHomeValue12                  -0.000 (-1.281, 1.281)       
+inflation.adjHH12                                               
+percentHighInc12              0.000 (-692,697.600, 692,697.600) 
+percentLowInc12                                                 
+Constant                     -26.566 (-671,545.500, 671,492.400)
+----------------------------------------------------------------
+Observations                                 145                
+Log Likelihood                             -0.000               
+Akaike Inf. Crit.                          36.000               
+================================================================
+Significance levels:         *p<0.05; **p<0.01; ***p<0.001      
+                             *** p<0.001                        
+                             ** p<0.01                          
+                             * p<0.05                           

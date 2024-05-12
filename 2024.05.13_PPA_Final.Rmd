@@ -17,10 +17,22 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(pacman)
-p_load(dplyr,sf,stats,tidycensus,tidyr, mapview, tigris,tmap)
+p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
 ```
 
-```{r callingacsdata, include=FALS, message=FALSE, warning=FALSE}
+```{r geography, include=FALSE, message=FALSE, warning=FALSE}
+
+options(tigris_use_cache = TRUE)
+
+md_bound <- counties(state = "MD") %>%
+  st_transform("EPSG:4269") %>%
+  erase_water(area_threshold = 0.9)
+
+water_bound <- st_as_sfc(st_bbox(md_bound), crs = "EPSG:4269")
+
+```
+
+```{r callingacsdata, include=FALSE, message=FALSE, warning=FALSE}
 #Getting my ACS Variable LIst
 acs_variable_list.2012 <- load_variables(2012, 
                                          "acs5", 
@@ -262,7 +274,7 @@ school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/
 
 ## Visualization
 
-```{r bmore_data, message=FALSE, warning=FALSE}
+```{r bmorevis_data, message=FALSE, warning=FALSE}
 
 #2022 Median Household Income
 bmore_hhinc22 <- get_acs(
@@ -317,8 +329,8 @@ bmore_hv22 <- get_acs(
 
 ```
 
-```{r bmore_map, message=FALSE, warning=FALSE}
-
+```{r bmorevis_map, message=FALSE, warning=FALSE}
+ 
 #2022 Median Household Income
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
