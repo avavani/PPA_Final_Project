@@ -21,8 +21,6 @@ p_load(dplyr,sf,stats,tidycensus,tidyr, mapview, tigris,tmap)
 ```
 
 ```{r geography, include=FALS, message=FALSE, warning=FALSE}
-
-```{r genindex, warning=FALSE, message=FALSE}
 #Getting my ACS Variable LIst
 acs_variable_list.2012 <- load_variables(2012, 
                                          "acs5", 
@@ -38,7 +36,7 @@ acs_vars <- c("B01001_001E",# ACS total Pop estimate
           "B07001_033", #moved in within same county
           "B07001_049", #moved in from same state
           "B07001_065", #moved in different state
-          "B07001_081", #moved abroad
+          "B07001_081", #moved from abroad
           "B06009_005", #bachelors degree
           "B25010_002", #owner occupied household size
           "B25010_003", #renter occupied HH size
@@ -52,9 +50,7 @@ bmore_acs12 <- get_acs(
   state = "MD", 
   county = "Baltimore City",
   year = 2012,
-  output = "wide")
-
-bmore_acs12 <- bmore_acs12 %>%
+  output = "wide")%>%
   rename(TotalPopulation12 = B01001_001E,
       TotalHousingUnits12 = B25002_001E,
       VacantHousingUnits12 = B25002_003E,
@@ -80,9 +76,7 @@ bmore_acs22 <- get_acs(
   state = "MD", 
   county = "Baltimore City",
   year = 2022,
-  output = "wide")
-
-bmore_acs22 <- bmore_acs22 %>%
+  output = "wide")%>%
   rename(TotalPopulation22 = B01001_001E,
       TotalHousingUnits22 = B25002_001E,
       VacantHousingUnits22 = B25002_003E,
@@ -141,7 +135,11 @@ all.acs <- bmore_acs12 %>%
   )%>%
   mutate(NAME = coalesce(NAME.x, NAME.y)) %>% 
   select(-NAME.x, -NAME.y) 
+```
 
+Now we are working on getting our gentrification index. First, we want to calculate the percentage of low and high income people for census tracts in both years.
+
+```{r}
 #Getting population by Income numbers
 bmore_ctmedhhinc12 <- get_acs(
   geography = "tract", 
@@ -196,7 +194,10 @@ bmore_ctmedhhinc22 <- get_acs(
   summarise(est22 = sum(est22)) %>%
   pivot_wider(names_from = var22, values_from = est22) %>%
   mutate(percentHighInc22 = H/tot, percentLowInc22 = L/tot)
+```
+Now that the data is ready getting it in my index
 
+```{r}
 #joining all
 bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
   select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
@@ -213,11 +214,10 @@ all.acs <- all.acs %>%
     NChangeInHighIncPct = ChangeInHighIncPct / max(abs(ChangeInHighIncPct), na.rm = TRUE),
     NChangeInLowIncPct = ChangeInLowIncPct / max(abs(ChangeInLowIncPct), na.rm = TRUE)
   )%>%
-  mutate(genindex = NHHIncChangeper + NChangeInHighIncPct + NChangeInLowIncPct)%>%
-  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.3, na.rm = TRUE)))~ 1,
+  mutate(genindex = (0.5*NHHIncChangeper) + (0.5*NChangeInHighIncPct) - NChangeInLowIncPct)%>%
+  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.2, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
-
 Now joining to Shape file
 
 ```{r}
