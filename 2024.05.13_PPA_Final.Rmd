@@ -227,6 +227,7 @@ all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 ```{r bmore_data, message=FALSE, warning=FALSE}
@@ -252,3 +253,152 @@ bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/re
 
 ## Moving to Modelling
 >>>>>>> fbe6223dd9b9a60d41998c1a607b4e9edb9cce81
+=======
+## Visualization
+
+## Moving to Modelling
+
+```{r modelling, warning=FALSE, message=FALSE}
+p_load(stargazer)
+
+all.acs12 <- all.acs %>%
+  select(GEOID, gentrify, ends_with("12"))
+
+train <- all.acs12 %>%
+  sample_frac(.75)
+
+train_index <- as.numeric(rownames(train))
+
+test <- all.acs12[-train_index, ]
+
+reg.gentrify <- glm(gentrify ~ ., data = 
+                    train %>%
+                      select(-GEOID),
+                    family = "binomial"(link = "logit"))
+
+stargazer(reg.gentrify, type = "text", out = "regression_summary.txt", title = "Regression Results", 
+          label = "tab:regression_results", align = TRUE, 
+          ci = TRUE, ci.level = 0.95, single.row = TRUE, 
+          star.cutoffs = c(0.05, 0.01, 0.001), 
+          notes = c("*** p<0.001", "** p<0.01", "* p<0.05"), 
+          notes.align = "l", notes.label = "Significance levels:")
+```
+
+Testing the outcomes. 
+
+```{r confusionmatrix, warning=FALSE, message=FALSE}
+testProbs <- 
+  data.frame(class = test$gentrify,
+             probs = predict(reg.gentrify, test, type = "response"))
+
+testProbs %>%
+  mutate(predClass = ifelse(probs >= .5, "1", "0"), 
+         predClass = factor(predClass, levels = c("0", "1")),  
+         class = factor(class, levels = c("0", "1"))) %>% 
+  { caret::confusionMatrix(.$predClass, .$class, positive = "1") }
+```
+
+More stuff
+
+```{r probdist, warning=FALSE, message=FALSE}
+p_load(ggplot2)
+palette_4_colors <- c("#e4572e","#17bebb","#ffc914","#A379C9")
+root.dir = "https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/DATA/"
+source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
+
+ggplot(testProbs, aes(x = probs, fill = as.factor(class))) + 
+  geom_density() +
+  facet_grid(class ~ .) +
+  scale_fill_manual(values = palette_4_colors) + xlim(0, 1) +
+  labs(x = "Gentrify", y = "Density of probabilities",
+       title = "Distribution of predicted probabilities by observed outcome") +
+  plotTheme() + theme(strip.text.x = element_text(size = 18),
+        legend.position = "none")+
+  theme(text = element_text(family = "Times New Roman", size = 12), 
+        plot.title = element_text(face = "bold", size = 14),
+        plot.subtitle = element_text(size = 12),
+        plot.caption = element_text(size = 8))
+```
+
+More of the stuff. This time calling up a ROC curve. 
+
+```{r ROCcurve, warning=FALSE, message=FALSE}
+p_load(pROC)
+
+iterateThresholds <- function(data, observedClass, predictedProbs) {
+  observedClass <- enquo(observedClass)
+  predictedProbs <- enquo(predictedProbs)
+  
+  x <- 0.01
+  all_prediction <- data.frame()
+  
+  while (x <= 1) {
+    this_prediction <- data %>%
+      mutate(predclass = ifelse(!!predictedProbs > x, 1, 0)) %>%
+      count(predclass, !!observedClass) %>%
+      summarize(
+        Count_TN = sum(n[predclass == 0 & !!observedClass == 0]),
+        Count_TP = sum(n[predclass == 1 & !!observedClass == 1]),
+        Count_FN = sum(n[predclass == 0 & !!observedClass == 1]),
+        Count_FP = sum(n[predclass == 1 & !!observedClass == 0]),
+        Rate_TP = Count_TP / (Count_TP + Count_FN),
+        Rate_FP = Count_FP / (Count_FP + Count_TN),
+        Rate_FN = Count_FN / (Count_FN + Count_TP),
+        Rate_TN = Count_TN / (Count_TN + Count_FP),
+        Accuracy = (Count_TP + Count_TN) / (Count_TP + Count_TN + Count_FN + Count_FP),
+        Threshold = round(x, 2),
+        .groups = 'drop'
+      )
+    
+    all_prediction <- rbind(all_prediction, this_prediction)
+    x <- x + .01
+  }
+  
+  return(all_prediction)
+}
+
+testProbs.thresholds <- iterateThresholds(
+  data = testProbs, 
+  observedClass = class, 
+  predictedProbs = probs
+)
+
+ggplot(testProbs.thresholds, aes(x = Threshold)) +
+  geom_line(aes(y = Accuracy, color = "Accuracy")) +
+  geom_line(aes(y = Rate_TP, color = "True Positive Rate")) +
+  geom_line(aes(y = Rate_FP, color = "False Positive Rate")) +
+  scale_color_manual(values = c("Accuracy" = "blue", "True Positive Rate" = "green", "False Positive Rate" = "red")) +
+  labs(title = "Model Performance Across Different Thresholds",
+       x = "Threshold", y = "Rate") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = "bottom",
+        text = element_text(family = "Times New Roman", size = 12),
+        plot.title = element_text(face = "bold", size = 14),
+        plot.subtitle = element_text(size = 12),
+        plot.caption = element_text(size = 8))
+```
+
+ROC curve
+
+```{r}
+p_load(gridExtra)
+
+aucTable <- testProbs %>% 
+  summarize(AUC = as.numeric(auc(roc(class, probs)))) %>% 
+  mutate(AUC = as.character(round(AUC, 3)))
+
+mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
+  ggplot(aes(Rate_FP, Rate_TP)) + 
+  geom_point(aes(shape = pointSize)) + geom_line() + scale_shape_identity() +
+  geom_abline(slope = 1, intercept = 0, size = 1.5, color = 'grey') +
+  annotation_custom(tableGrob(aucTable, rows = NULL), xmin = .65, xmax = 1, ymin = 0, ymax = .45) +
+  labs(title="ROC Curves", x="False Positive Rate", y="True Positive Rate") +
+  plotTheme()+
+  theme(text = element_text(family = "Times New Roman", size = 12), 
+        plot.title = element_text(face = "bold", size = 14),
+        plot.subtitle = element_text(size = 12),
+        plot.caption = element_text(size = 8))
+```
+
+>>>>>>> 6903138511535774f4fddc4df327055656588ac0

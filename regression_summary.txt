@@ -1,0 +1,35 @@
+
+Regression Results
+==========================================================
+                                  Dependent variable:     
+                             -----------------------------
+                                       gentrify           
+----------------------------------------------------------
+TotalPopulation12                0.001 (-0.002, 0.003)    
+TotalHousingUnits12             -0.001 (-0.005, 0.004)    
+VacantHousingUnits12            -0.001 (-0.006, 0.005)    
+MedianHouseholdIncome12       0.00002 (-0.00003, 0.0001)  
+WhiteAlone12                    0.0001 (-0.001, 0.001)    
+GradProfessionalDegree12        0.003 (-0.0003, 0.006)    
+MovedWithinCounty12             -0.002 (-0.005, 0.002)    
+MovedFromSameState12            0.008** (0.002, 0.014)    
+MovedFromDifferentState12       -0.008 (-0.018, 0.003)    
+MovedAbroad12                   -0.004 (-0.023, 0.015)    
+BachelorsDegree12                0.001 (-0.004, 0.006)    
+OwnerOccupiedHouseholdSize12    -0.319 (-1.197, 0.558)    
+RenterOccupiedSize12             0.456 (-0.600, 1.512)    
+FamilyHouseholds12              -0.003 (-0.011, 0.004)    
+NonFamilyHouseholds12                                     
+inflation.adjHH12                                         
+percentHighInc12             -10.868*** (-16.952, -4.784) 
+percentLowInc12                                           
+Constant                        5.027 (-0.312, 10.366)    
+----------------------------------------------------------
+Observations                              146             
+Log Likelihood                          -62.147           
+Akaike Inf. Crit.                       156.294           
+==========================================================
+Significance levels:         *p<0.05; **p<0.01; ***p<0.001
+                             *** p<0.001                  
+                             ** p<0.01                    
+                             * p<0.05                     
