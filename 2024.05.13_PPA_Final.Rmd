@@ -227,9 +227,9 @@ all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
+<<<<<<< HEAD
 
-
-
+<<<<<<< HEAD
 ```{r bmore_data, message=FALSE, warning=FALSE}
 #Vacant lots 
 bmore_lots <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/1/query?outFields=*&where=1%3D1&f=geojson")
@@ -253,11 +253,130 @@ bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/re
 
 ```{r bmore_data, message=FALSE, warning=FALSE}
 
+#2022 Median Household Income
+bmore_hhinc22 <- get_acs(
+  geography = "tract", 
+  variables = "B19013_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE 
+) %>%
+  select(GEOID, estimate)
+
+#2022 Majority Non-White
+bmore_nonwhite22 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B03002_001", white = "B03002_003"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE
+) %>%
+  select(GEOID, variable, estimate) %>%
+  pivot_wider(names_from = variable, values_from = estimate) %>%
+  mutate(nonwhite = 1 - (white/tot))
+
+#2022 Majority Owner
+bmore_pcentoo22 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B25003_001", oo = "B25003_002", ro = "B25003_003"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE
+) %>%
+  select(GEOID, variable, estimate) %>%
+  pivot_wider(names_from = variable, values_from = estimate) %>%
+  mutate(propoo = (oo/tot))
+
+#2022 Median Home Value
+bmore_hv22 <- get_acs(
+  geography = "tract", 
+  variables = "B25077_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE 
+) %>%
+  select(GEOID, estimate)
+
+#2022 Median Rent
+
 
 ```
 
 ```{r bmore_map, message=FALSE, warning=FALSE}
 
+#2022 Median Household Income
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_hhinc22, aes(fill = estimate), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1",
+    labels = scales::dollar) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Median Household Income",
+       title = "2022 Median Household Income",
+       subtitle = "Baltimore City, MD")
+
+#2022 Majority Non-White
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_nonwhite22, aes(fill = nonwhite), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1",
+    labels = scales::percent) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Percent Non-White",
+       title = "2022 Race/Ethnicity",
+       subtitle = "Baltimore City, MD")
+
+#2022 Majority Owner
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_pcentoo22, aes(fill = propoo), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1",
+    labels = scales::percent) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Percent Owner-Occupied",
+       title = "2022 Tenure",
+       subtitle = "Baltimore City, MD")
+
+#2022 Median Home Value
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_hv22, aes(fill = estimate), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1",
+    labels = scales::dollar) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Median Home Value",
+       title = "2022 Median Home Value",
+       subtitle = "Baltimore City, MD")
+
+#2022 Median Rent
 
 ```
 
@@ -406,4 +525,4 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
         plot.caption = element_text(size = 8))
 ```
 
-
+>>>>>>> 6903138511535774f4fddc4df327055656588ac0
