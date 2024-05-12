@@ -127,7 +127,13 @@ bmore_genindex <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID"
   select(GEOID, pH12, pH22, pL12, pL22) %>%
   mutate(genindex = (pH22 - pH12) - (pL22 - pL12))
 
+#Label CT based on whether they have or have not gentrified
+bmore_genindex <- bmore_genindex %>%
+  mutate(normal = (genindex + 1)/2) %>%
+  mutate(gent = case_when(normal >= (quantile(bmore_genindex$normal, probs = c(0.75), na.rm = TRUE)) ~ "Gentrified", TRUE ~ 'Not Gentrified'))
+
 #Check for proportion of residents who moved in prior to 2012?
+
 
 ```
 
