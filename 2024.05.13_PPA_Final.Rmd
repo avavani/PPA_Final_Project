@@ -20,7 +20,7 @@ library(pacman)
 p_load(dplyr,sf,stats,tidycensus,tidyr, mapview, tigris,tmap)
 ```
 
-```{r geography, include=FALS, message=FALSE, warning=FALSE}
+```{r callingacsdata, include=FALS, message=FALSE, warning=FALSE}
 #Getting my ACS Variable LIst
 acs_variable_list.2012 <- load_variables(2012, 
                                          "acs5", 
@@ -139,7 +139,7 @@ all.acs <- bmore_acs12 %>%
 
 Now we are working on getting our gentrification index. First, we want to calculate the percentage of low and high income people for census tracts in both years.
 
-```{r}
+```{r callingincomedata}
 #Getting population by Income numbers
 bmore_ctmedhhinc12 <- get_acs(
   geography = "tract", 
@@ -197,7 +197,7 @@ bmore_ctmedhhinc22 <- get_acs(
 ```
 Now that the data is ready getting it in my index
 
-```{r}
+```{r makingindex}
 #joining all
 bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
   select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
@@ -214,20 +214,21 @@ all.acs <- all.acs %>%
     NChangeInHighIncPct = ChangeInHighIncPct / max(abs(ChangeInHighIncPct), na.rm = TRUE),
     NChangeInLowIncPct = ChangeInLowIncPct / max(abs(ChangeInLowIncPct), na.rm = TRUE)
   )%>%
-  mutate(genindex = (0.5*NHHIncChangeper) + (0.5*NChangeInHighIncPct) - NChangeInLowIncPct)%>%
-  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.2, na.rm = TRUE)))~ 1,
+  mutate(genindex = NChangeInHighIncPct - (NChangeInLowIncPct))%>%
+  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.75, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
 Now joining to Shape file
 
-```{r}
+```{r joiningviz1}
 baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
-all.acs <- left_join(baltimore_tracts, all.acs, by = "GEOID")
+all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 
-tm_shape(all.acs)+
+tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
 
+<<<<<<< HEAD
 ```{r bmore_data, message=FALSE, warning=FALSE}
 #Vacant lots 
 bmore_lots <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/1/query?outFields=*&where=1%3D1&f=geojson")
@@ -246,3 +247,8 @@ bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/
 bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
 
 ```
+=======
+## Visualization
+
+## Moving to Modelling
+>>>>>>> fbe6223dd9b9a60d41998c1a607b4e9edb9cce81
