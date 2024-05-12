@@ -248,16 +248,21 @@ bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/
 bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
 
 ```
-=======
+
 ## Visualization
 
-## Moving to Modelling
->>>>>>> fbe6223dd9b9a60d41998c1a607b4e9edb9cce81
-=======
-## Visualization
+```{r bmore_data, message=FALSE, warning=FALSE}
+
+
+```
+
+```{r bmore_map, message=FALSE, warning=FALSE}
+
+
+```
+
 
 ## Moving to Modelling
-
 ```{r modelling, warning=FALSE, message=FALSE}
 p_load(stargazer)
 
