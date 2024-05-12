@@ -228,4 +228,6 @@ tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
 
+## Visualization
+
 ## Moving to Modelling
