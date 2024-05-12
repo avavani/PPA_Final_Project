@@ -227,3 +227,5 @@ all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
+
+## Moving to Modelling
