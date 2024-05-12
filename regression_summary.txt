@@ -1,35 +1,37 @@
 
 Regression Results
-==========================================================
-                                  Dependent variable:     
-                             -----------------------------
-                                       gentrify           
-----------------------------------------------------------
-TotalPopulation12                0.001 (-0.002, 0.003)    
-TotalHousingUnits12             -0.001 (-0.005, 0.004)    
-VacantHousingUnits12            -0.001 (-0.006, 0.005)    
-MedianHouseholdIncome12       0.00002 (-0.00003, 0.0001)  
-WhiteAlone12                    0.0001 (-0.001, 0.001)    
-GradProfessionalDegree12        0.003 (-0.0003, 0.006)    
-MovedWithinCounty12             -0.002 (-0.005, 0.002)    
-MovedFromSameState12            0.008** (0.002, 0.014)    
-MovedFromDifferentState12       -0.008 (-0.018, 0.003)    
-MovedAbroad12                   -0.004 (-0.023, 0.015)    
-BachelorsDegree12                0.001 (-0.004, 0.006)    
-OwnerOccupiedHouseholdSize12    -0.319 (-1.197, 0.558)    
-RenterOccupiedSize12             0.456 (-0.600, 1.512)    
-FamilyHouseholds12              -0.003 (-0.011, 0.004)    
-NonFamilyHouseholds12                                     
-inflation.adjHH12                                         
-percentHighInc12             -10.868*** (-16.952, -4.784) 
-percentLowInc12                                           
-Constant                        5.027 (-0.312, 10.366)    
-----------------------------------------------------------
-Observations                              146             
-Log Likelihood                          -62.147           
-Akaike Inf. Crit.                       156.294           
-==========================================================
-Significance levels:         *p<0.05; **p<0.01; ***p<0.001
-                             *** p<0.001                  
-                             ** p<0.01                    
-                             * p<0.05                     
+================================================================
+                                     Dependent variable:        
+                             -----------------------------------
+                                          gentrify              
+----------------------------------------------------------------
+TotalPopulation12                 0.000 (-222.235, 222.235)     
+TotalHousingUnits12               0.000 (-485.529, 485.529)     
+VacantHousingUnits12             -0.000 (-658.037, 658.037)     
+MedianHouseholdIncome12             0.000 (-7.794, 7.794)       
+WhiteAlone12                     -0.000 (-103.425, 103.425)     
+GradProfessionalDegree12         -0.000 (-395.077, 395.077)     
+MovedWithinCounty12              -0.000 (-386.443, 386.443)     
+MovedFromSameState12             -0.000 (-799.329, 799.329)     
+MovedFromDifferentState12        -0.000 (-886.264, 886.264)     
+MovedAbroad12                   0.000 (-1,471.839, 1,471.839)   
+BachelorsDegree12                 0.000 (-599.018, 599.018)     
+OwnerOccupiedHouseholdSize12  0.000 (-127,488.500, 127,488.500) 
+RenterOccupiedSize12          0.000 (-146,915.500, 146,915.500) 
+FamilyHouseholds12               -0.000 (-813.655, 813.655)     
+NonFamilyHouseholds12                                           
+MedianRent12                     -0.000 (-363.844, 363.844)     
+MedianHomeValue12                  -0.000 (-1.281, 1.281)       
+inflation.adjHH12                                               
+percentHighInc12              0.000 (-692,697.600, 692,697.600) 
+percentLowInc12                                                 
+Constant                     -26.566 (-671,545.500, 671,492.400)
+----------------------------------------------------------------
+Observations                                 145                
+Log Likelihood                             -0.000               
+Akaike Inf. Crit.                          36.000               
+================================================================
+Significance levels:         *p<0.05; **p<0.01; ***p<0.001      
+                             *** p<0.001                        
+                             ** p<0.01                          
+                             * p<0.05                           

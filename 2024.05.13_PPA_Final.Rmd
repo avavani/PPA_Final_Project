@@ -17,10 +17,22 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(pacman)
-p_load(dplyr,sf,stats,tidycensus,tidyr, mapview, tigris,tmap)
+p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
 ```
 
-```{r callingacsdata, include=FALS, message=FALSE, warning=FALSE}
+```{r geography, include=FALSE, message=FALSE, warning=FALSE}
+
+options(tigris_use_cache = TRUE)
+
+md_bound <- counties(state = "MD") %>%
+  st_transform("EPSG:4269") %>%
+  erase_water(area_threshold = 0.9)
+
+water_bound <- st_as_sfc(st_bbox(md_bound), crs = "EPSG:4269")
+
+```
+
+```{r callingacsdata, include=FALSE, message=FALSE, warning=FALSE}
 #Getting my ACS Variable LIst
 acs_variable_list.2012 <- load_variables(2012, 
                                          "acs5", 
@@ -33,15 +45,17 @@ acs_vars <- c("B01001_001E",# ACS total Pop estimate
           "B19013_001E",# Median HH Income ($)
           "B02001_002E",# People describing themselves as "white alone"
           "B06009_006E", # Total graduate or professional degree
-          "B07001_033", #moved in within same county
-          "B07001_049", #moved in from same state
-          "B07001_065", #moved in different state
-          "B07001_081", #moved from abroad
-          "B06009_005", #bachelors degree
-          "B25010_002", #owner occupied household size
-          "B25010_003", #renter occupied HH size
-          "B11016_002", #family households
-          "B11016_009") #non family households
+          "B07001_033E", #moved in within same county
+          "B07001_049E", #moved in from same state
+          "B07001_065E", #moved in different state
+          "B07001_081E", #moved from abroad
+          "B06009_005E", #bachelors degree
+          "B25010_002E", #owner occupied household size
+          "B25010_003E", #renter occupied HH size
+          "B11016_002E", #family households
+          "B11016_009E", #non family households
+          "B25064_001E", #MEDIAN GROSS RENT
+          "B25077_001E") #MEDIAN HOME VALUE
 
 #Extracting the data for 2012
 bmore_acs12 <- get_acs(
@@ -65,7 +79,9 @@ bmore_acs12 <- get_acs(
       OwnerOccupiedHouseholdSize12 = B25010_002E,
       RenterOccupiedSize12 = B25010_003E,
       FamilyHouseholds12 = B11016_002E,
-      NonFamilyHouseholds12 = B11016_009E)%>%
+      NonFamilyHouseholds12 = B11016_009E,
+      MedianRent12 = B25064_001E,
+      MedianHomeValue12 = B25077_001E)%>%
   mutate(inflation.adjHH12 = MedianHouseholdIncome12 * 1.24)%>%
   select(GEOID,NAME,ends_with("12"))
 
@@ -91,7 +107,9 @@ bmore_acs22 <- get_acs(
       OwnerOccupiedHouseholdSize22 = B25010_002E,
       RenterOccupiedSize22 = B25010_003E,
       FamilyHouseholds22 = B11016_002E,
-      NonFamilyHouseholds22 = B11016_009E)%>%
+      NonFamilyHouseholds22 = B11016_009E,
+      MedianRent22 = B25064_001E,
+      MedianHomeValue22 = B25077_001E)%>%
   select(GEOID,NAME,ends_with("22"))
 
 #one census tract has been combined in 2022. So I am adjusting this info in 2012 and joining back
@@ -114,7 +132,9 @@ changed_22 <- bmore_acs12 %>%
     RenterOccupiedSize12 = mean(RenterOccupiedSize12),
     FamilyHouseholds12 = sum(FamilyHouseholds12),
     NonFamilyHouseholds12 = sum(NonFamilyHouseholds12),
-    inflation.adjHH12 = mean(inflation.adjHH12) 
+    inflation.adjHH12 = mean(inflation.adjHH12),
+    MedianRent12 = mean(MedianRent12),
+    MedianHomeValue12 = mean(MedianRent12)
   ) %>%
   dplyr::mutate(
     NAME = "Census Tract 2806, Baltimore city, Maryland",
@@ -248,19 +268,144 @@ bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/
 #Percentage of vacant lots 
 bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
 
+
 #Note to self (Tina) - make new combined features file 
+
+
+#Baltimore schools
+
+school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
 
 ```
 
 ## Visualization
 
-```{r bmore_data, message=FALSE, warning=FALSE}
+```{r bmorevis_data, message=FALSE, warning=FALSE}
+
+#2022 Median Household Income
+bmore_hhinc22 <- get_acs(
+  geography = "tract", 
+  variables = "B19013_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE 
+) %>%
+  select(GEOID, estimate)
+
+#2022 Majority Non-White
+bmore_nonwhite22 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B03002_001", white = "B03002_003"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE
+) %>%
+  select(GEOID, variable, estimate) %>%
+  pivot_wider(names_from = variable, values_from = estimate) %>%
+  mutate(nonwhite = 1 - (white/tot))
+
+#2022 Majority Owner
+bmore_pcentoo22 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B25003_001", oo = "B25003_002", ro = "B25003_003"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE
+) %>%
+  select(GEOID, variable, estimate) %>%
+  pivot_wider(names_from = variable, values_from = estimate) %>%
+  mutate(propoo = (oo/tot))
+
+#2022 Median Home Value
+bmore_hv22 <- get_acs(
+  geography = "tract", 
+  variables = "B25077_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE 
+) %>%
+  select(GEOID, estimate)
+
+#2022 Median Rent
 
 
 ```
 
-```{r bmore_map, message=FALSE, warning=FALSE}
+```{r bmorevis_map, message=FALSE, warning=FALSE}
+ 
+#2022 Median Household Income
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_hhinc22, aes(fill = estimate), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1",
+    labels = scales::dollar) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Median Household Income",
+       title = "2022 Median Household Income",
+       subtitle = "Baltimore City, MD")
 
+#2022 Majority Non-White
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_nonwhite22, aes(fill = nonwhite), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1",
+    labels = scales::percent) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Percent Non-White",
+       title = "2022 Race/Ethnicity",
+       subtitle = "Baltimore City, MD")
+
+#2022 Majority Owner
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_pcentoo22, aes(fill = propoo), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1",
+    labels = scales::percent) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Percent Owner-Occupied",
+       title = "2022 Tenure",
+       subtitle = "Baltimore City, MD")
+
+#2022 Median Home Value
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_hv22, aes(fill = estimate), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1",
+    labels = scales::dollar) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Median Home Value",
+       title = "2022 Median Home Value",
+       subtitle = "Baltimore City, MD")
+
+#2022 Median Rent
 
 ```
 
