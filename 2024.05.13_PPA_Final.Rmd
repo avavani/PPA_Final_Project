@@ -251,12 +251,18 @@ bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/re
 
 ## Visualization
 
+```{r bmore_data, message=FALSE, warning=FALSE}
+
+
+```
+
+```{r bmore_map, message=FALSE, warning=FALSE}
+
+
+```
+
+
 ## Moving to Modelling
-
-## Visualization
-
-## Moving to Modelling
-
 ```{r modelling, warning=FALSE, message=FALSE}
 p_load(stargazer)
 
