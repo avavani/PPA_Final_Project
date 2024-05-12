@@ -18,15 +18,28 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 
 library(dplyr)
+library(ggplot2)
 library(sf)
 library(stats)
 library(tidycensus)
 library(tidyr)
+library(tigris)
 
 ```
 
+```{r geography, include=FALS, message=FALSE, warning=FALSE}
 
-```{r genindex, warning=FALSE, message=FALSE}
+options(tigris_use_cache = TRUE)
+
+md_bound <- counties(state = "MD") %>%
+  st_transform("EPSG:4269") %>%
+  erase_water(area_threshold = 0.9)
+
+water_bound <- st_as_sfc(st_bbox(md_bound), crs = "EPSG:4269")
+
+```
+
+```{r genindex_data, warning=FALSE, message=FALSE}
 
 #Calculate 80% of median household income for 2012
 bmore_hhinc12 <- get_acs(
@@ -69,6 +82,8 @@ bmore_80medhhinc22 <- bmore_80medhhinc22[[1,1]]
 bmore_80medhhinc22 = (bmore_80medhhinc22 * .80)
 
 #Determine proportion of the population per ct that is Low and High income
+acsvar22 <- load_variables(2022, "acs5", cache = TRUE)
+
 bmore_ctmedhhinc12 <- get_acs(
   geography = "tract", 
   variables = c(tot = "B19001_001", 
@@ -92,7 +107,7 @@ bmore_ctmedhhinc22 <- get_acs(
   geography = "tract", 
   variables = c(tot = "B19001_001", 
                 L = "B19001_002", L = "B19001_003", L = "B19001_004", L = "B19001_005", L = "B19001_006",
-                H = "B19001_007", H = "B19001_008", H = "B19001_009", H = "B19001_010", H = "B19001_011", 
+                L = "B19001_007", L = "B19001_008", L = "B19001_009", H = "B19001_010", H = "B19001_011", 
                 H = "B19001_012", H = "B19001_013", H = "B19001_014", H = "B19001_015", H = "B19001_016", 
                 H = "B19001_017"),
   state = "MD", 
@@ -108,7 +123,7 @@ bmore_ctmedhhinc22 <- get_acs(
   mutate(pH22 = H/tot, pL22 = L/tot)
 
 #Calculate gentrification index
-bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
+bmore_genindex <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
   select(GEOID, pH12, pH22, pL12, pL22) %>%
   mutate(genindex = (pH22 - pH12) - (pL22 - pL12))
 
@@ -116,3 +131,38 @@ bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GE
 
 ```
 
+```{r genindex_map, warning=FALSE, message=FALSE}
+
+#Attach geometry to the index
+bmore_ctgeo <- get_acs(
+  geography = "tract", 
+  variables = "B19001_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE 
+) %>%
+  select(GEOID) %>%
+  st_transform("EPSG:4269")
+
+bmore_genindex_sf <- left_join(bmore_ctgeo, bmore_genindex, by = "GEOID")
+
+#Map
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_genindex_sf, aes(fill = genindex), col = "transparent") +
+  scale_fill_gradient(
+    high = "orangered4",
+    low = "lightgoldenrod1") +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Gentrification Index",
+       title = "2022 Gentrification Index",
+       subtitle = "Baltimore City, MD")
+
+#"firebrick4", "darkgoldenrod", "darkolivegreen", "royalblue4", "mediumpurple4"
+
+```
