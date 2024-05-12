@@ -236,16 +236,19 @@ bmore_lots <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Hou
 
 bmore_lots$DateNotice <- as.POSIXct(bmore_lots$DateNotice, format = "%Y-%m-%d %H:%M:%S")
 
+#Open-Bid List - Vacants to Value 
+bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")
+
 #Universities & colleges? 
 bmore_colleges <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Universities_and_Colleges/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
 
 #Businesses by community statistical areas 
 bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiind/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-#Bike lane infrastructure
-
+ 
 #Percentage of vacant lots 
 bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+
+#Note to self (Tina) - make new combined features file 
 
 ```
 
