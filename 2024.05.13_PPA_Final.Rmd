@@ -16,74 +16,131 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-library(dplyr)
-library(ggplot2)
-library(sf)
-library(stats)
-library(tidycensus)
-library(tidyr)
-library(tigris)
-
+library(pacman)
+p_load(dplyr,sf,stats,tidycensus,tidyr, mapview, tigris,tmap)
 ```
 
 ```{r geography, include=FALS, message=FALSE, warning=FALSE}
+#Getting my ACS Variable LIst
+acs_variable_list.2012 <- load_variables(2012, 
+                                         "acs5", 
+                                         cache = TRUE)
 
-options(tigris_use_cache = TRUE)
+#Picking out my variables of interest
+acs_vars <- c("B01001_001E",# ACS total Pop estimate
+          "B25002_001E",# Estimate of total housing units
+          "B25002_003E",# Number of vacant housing units
+          "B19013_001E",# Median HH Income ($)
+          "B02001_002E",# People describing themselves as "white alone"
+          "B06009_006E", # Total graduate or professional degree
+          "B07001_033", #moved in within same county
+          "B07001_049", #moved in from same state
+          "B07001_065", #moved in different state
+          "B07001_081", #moved abroad
+          "B06009_005", #bachelors degree
+          "B25010_002", #owner occupied household size
+          "B25010_003", #renter occupied HH size
+          "B11016_002", #family households
+          "B11016_009") #non family households
 
-md_bound <- counties(state = "MD") %>%
-  st_transform("EPSG:4269") %>%
-  erase_water(area_threshold = 0.9)
-
-water_bound <- st_as_sfc(st_bbox(md_bound), crs = "EPSG:4269")
-
-```
-
-```{r genindex_data, warning=FALSE, message=FALSE}
-
-#Calculate 80% of median household income for 2012
-bmore_hhinc12 <- get_acs(
+#Extracting the data for 2012
+bmore_acs12 <- get_acs(
   geography = "tract", 
-  variables = "B19013_001",
+  variables = acs_vars,
   state = "MD", 
   county = "Baltimore City",
   year = 2012,
-  geometry = TRUE 
-) %>%
-  select(GEOID, estimate) %>%
-  rename(est12 = estimate)
+  output = "wide")
 
-bmore_80medhhinc12 <- bmore_hhinc12 %>%
-  na.omit() %>%
-  summarise(med12 = median(est12)) %>%
-  st_drop_geometry()
+bmore_acs12 <- bmore_acs12 %>%
+  rename(TotalPopulation12 = B01001_001E,
+      TotalHousingUnits12 = B25002_001E,
+      VacantHousingUnits12 = B25002_003E,
+      MedianHouseholdIncome12 = B19013_001E,
+      WhiteAlone12 = B02001_002E,
+      GradProfessionalDegree12 = B06009_006E,
+      MovedWithinCounty12 = B07001_033E,
+      MovedFromSameState12 = B07001_049E,
+      MovedFromDifferentState12 = B07001_065E,
+      MovedAbroad12 = B07001_081E,
+      BachelorsDegree12 = B06009_005E,
+      OwnerOccupiedHouseholdSize12 = B25010_002E,
+      RenterOccupiedSize12 = B25010_003E,
+      FamilyHouseholds12 = B11016_002E,
+      NonFamilyHouseholds12 = B11016_009E)%>%
+  mutate(inflation.adjHH12 = MedianHouseholdIncome12 * 1.24)%>%
+  select(GEOID,NAME,ends_with("12"))
 
-bmore_80medhhinc12 <- bmore_80medhhinc12[[1,1]]
-bmore_80medhhinc12 = (bmore_80medhhinc12 * .80)
-
-#Calculate 80% of median household income for 2022
-bmore_hhinc22 <- get_acs(
+#extracting my data for 2022
+bmore_acs22 <- get_acs(
   geography = "tract", 
-  variables = "B19013_001",
+  variables = acs_vars,
   state = "MD", 
   county = "Baltimore City",
   year = 2022,
-  geometry = FALSE 
-) %>%
-  select(GEOID, estimate) %>%
-  rename(est22 = estimate)
+  output = "wide")
 
-bmore_80medhhinc22 <- bmore_hhinc22 %>%
-  na.omit() %>%
-  summarise(med12 = median(est22)) %>%
-  st_drop_geometry()
+bmore_acs22 <- bmore_acs22 %>%
+  rename(TotalPopulation22 = B01001_001E,
+      TotalHousingUnits22 = B25002_001E,
+      VacantHousingUnits22 = B25002_003E,
+      MedianHouseholdIncome22 = B19013_001E,
+      WhiteAlone22 = B02001_002E,
+      GradProfessionalDegree22 = B06009_006E,
+      MovedWithinCounty22 = B07001_033E,
+      MovedFromSameState22 = B07001_049E,
+      MovedFromDifferentState22 = B07001_065E,
+      MovedAbroad22 = B07001_081E,
+      BachelorsDegree22 = B06009_005E,
+      OwnerOccupiedHouseholdSize22 = B25010_002E,
+      RenterOccupiedSize22 = B25010_003E,
+      FamilyHouseholds22 = B11016_002E,
+      NonFamilyHouseholds22 = B11016_009E)%>%
+  select(GEOID,NAME,ends_with("22"))
 
-bmore_80medhhinc22 <- bmore_80medhhinc22[[1,1]]
-bmore_80medhhinc22 = (bmore_80medhhinc22 * .80)
+#one census tract has been combined in 2022. So I am adjusting this info in 2012 and joining back
+changed_22 <- bmore_acs12 %>%
+  filter(NAME %in% c("Census Tract 1801, Baltimore city, Maryland", 
+                     "Census Tract 1802, Baltimore city, Maryland"))%>%
+  dplyr::summarize(
+    TotalPopulation12 = sum(TotalPopulation12),
+    TotalHousingUnits12 = sum(TotalHousingUnits12),
+    VacantHousingUnits12 = sum(VacantHousingUnits12),
+    MedianHouseholdIncome12 = mean(MedianHouseholdIncome12),
+    WhiteAlone12 = sum(WhiteAlone12),
+    GradProfessionalDegree12 = sum(GradProfessionalDegree12),
+    MovedWithinCounty12 = sum(MovedWithinCounty12),
+    MovedFromSameState12 = sum(MovedFromSameState12),
+    MovedFromDifferentState12 = sum(MovedFromDifferentState12),
+    MovedAbroad12 = sum(MovedAbroad12),
+    BachelorsDegree12 = sum(BachelorsDegree12),
+    OwnerOccupiedHouseholdSize12 = mean(OwnerOccupiedHouseholdSize12),
+    RenterOccupiedSize12 = mean(RenterOccupiedSize12),
+    FamilyHouseholds12 = sum(FamilyHouseholds12),
+    NonFamilyHouseholds12 = sum(NonFamilyHouseholds12),
+    inflation.adjHH12 = mean(inflation.adjHH12) 
+  ) %>%
+  dplyr::mutate(
+    NAME = "Census Tract 2806, Baltimore city, Maryland",
+    GEOID = "24510280600"
+  )
 
-#Determine proportion of the population per ct that is Low and High income
-acsvar22 <- load_variables(2022, "acs5", cache = TRUE)
+#joining back adjusted info
+bmore_acs12 <- bmore_acs12 %>%
+  filter(!(NAME %in% c("Census Tract 1801, Baltimore city, Maryland", 
+                       "Census Tract 1802, Baltimore city, Maryland"))) %>%
+  bind_rows(changed_22)
 
+#creating large dataset
+all.acs <- bmore_acs12 %>%
+  left_join(bmore_acs22, by = c("GEOID"))%>%
+  mutate(
+    HHIncChangeper = ((MedianHouseholdIncome22 - MedianHouseholdIncome12) / MedianHouseholdIncome12) * 100
+  )%>%
+  mutate(NAME = coalesce(NAME.x, NAME.y)) %>% 
+  select(-NAME.x, -NAME.y) 
+
+#Getting population by Income numbers
 bmore_ctmedhhinc12 <- get_acs(
   geography = "tract", 
   variables = c(tot = "B19001_001", 
@@ -101,8 +158,24 @@ bmore_ctmedhhinc12 <- get_acs(
   group_by(GEOID, var12) %>%
   summarise(est12 = sum(est12)) %>%
   pivot_wider(names_from = var12, values_from = est12) %>%
-  mutate(pH12 = H/tot, pL12 = L/tot)
+  mutate(percentHighInc12 = H/tot, percentLowInc12 = L/tot)
 
+#adjusting for joined census tracts
+changed_22Inc <- bmore_ctmedhhinc12 %>%
+  filter(GEOID %in% c("24510180100", "24510180200")) %>%
+  ungroup() %>%
+  summarize(H = sum(H), L = sum(L), tot = sum(tot)) %>%
+  mutate(percentHighInc12 = H / tot,
+         percentLowInc12 = L / tot) %>%
+  mutate(GEOID = "24510280600")
+
+#joining info back to 2012
+bmore_ctmedhhinc12 <- bmore_ctmedhhinc12 %>%
+  ungroup()%>%
+  filter(!(GEOID %in% c("24510180100", "24510180200"))) %>%
+  bind_rows(changed_22Inc)
+
+#getting HH income for 2022
 bmore_ctmedhhinc22 <- get_acs(
   geography = "tract", 
   variables = c(tot = "B19001_001", 
@@ -120,12 +193,11 @@ bmore_ctmedhhinc22 <- get_acs(
   group_by(GEOID, var22) %>%
   summarise(est22 = sum(est22)) %>%
   pivot_wider(names_from = var22, values_from = est22) %>%
-  mutate(pH22 = H/tot, pL22 = L/tot)
+  mutate(percentHighInc22 = H/tot, percentLowInc22 = L/tot)
 
-#Calculate gentrification index
-bmore_genindex <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
-  select(GEOID, pH12, pH22, pL12, pL22) %>%
-  mutate(genindex = (pH22 - pH12) - (pL22 - pL12))
+#joining all
+bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
+  select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
 
 #Label CT based on whether they have or have not gentrified
 bmore_genindex <- bmore_genindex %>%
@@ -219,17 +291,6 @@ bmore_nonwhite22 <- get_acs(
   mutate(nonwhite = 1 - (white/tot))
 
 #2022 Majority Owner
-bmore_pcentoo22 <- get_acs(
-  geography = "tract", 
-  variables = c(tot = "B25003_001", oo = "B25003_002", ro = "B25003_003"),
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = TRUE
-) %>%
-  select(GEOID, variable, estimate) %>%
-  pivot_wider(names_from = variable, values_from = estimate) %>%
-  mutate(propoo = (oo/tot))
 
 #2022 Median Home Value
 
@@ -275,24 +336,8 @@ ggplot() +
        subtitle = "Baltimore City, MD")
 
 #2022 Majority Owner
-ggplot() +
-  geom_sf(data = water_bound, fill = "steelblue") +
-  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = bmore_pcentoo22, aes(fill = propoo), col = "transparent") +
-  scale_fill_gradient(
-    high = "orangered4",
-    low = "lightgoldenrod1",
-    labels = scales::percent) +
-  theme_void() +
-  xlim(-76.75, -76.48) +
-  ylim(39.2, 39.38) +
-  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Percent Owner-Occupied",
-       title = "2022 Tenure",
-       subtitle = "Baltimore City, MD")
 
 #2022 Median Home Value
-
 
 #2022 Median Rent
 
