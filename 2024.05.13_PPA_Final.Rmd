@@ -36,7 +36,7 @@ acs_vars <- c("B01001_001E",# ACS total Pop estimate
           "B07001_033", #moved in within same county
           "B07001_049", #moved in from same state
           "B07001_065", #moved in different state
-          "B07001_081", #moved abroad
+          "B07001_081", #moved from abroad
           "B06009_005", #bachelors degree
           "B25010_002", #owner occupied household size
           "B25010_003", #renter occupied HH size
@@ -50,9 +50,7 @@ bmore_acs12 <- get_acs(
   state = "MD", 
   county = "Baltimore City",
   year = 2012,
-  output = "wide")
-
-bmore_acs12 <- bmore_acs12 %>%
+  output = "wide")%>%
   rename(TotalPopulation12 = B01001_001E,
       TotalHousingUnits12 = B25002_001E,
       VacantHousingUnits12 = B25002_003E,
@@ -78,9 +76,7 @@ bmore_acs22 <- get_acs(
   state = "MD", 
   county = "Baltimore City",
   year = 2022,
-  output = "wide")
-
-bmore_acs22 <- bmore_acs22 %>%
+  output = "wide")%>%
   rename(TotalPopulation22 = B01001_001E,
       TotalHousingUnits22 = B25002_001E,
       VacantHousingUnits22 = B25002_003E,
@@ -139,7 +135,11 @@ all.acs <- bmore_acs12 %>%
   )%>%
   mutate(NAME = coalesce(NAME.x, NAME.y)) %>% 
   select(-NAME.x, -NAME.y) 
+```
 
+Now we are working on getting our gentrification index. First, we want to calculate the percentage of low and high income people for census tracts in both years.
+
+```{r}
 #Getting population by Income numbers
 bmore_ctmedhhinc12 <- get_acs(
   geography = "tract", 
@@ -194,153 +194,36 @@ bmore_ctmedhhinc22 <- get_acs(
   summarise(est22 = sum(est22)) %>%
   pivot_wider(names_from = var22, values_from = est22) %>%
   mutate(percentHighInc22 = H/tot, percentLowInc22 = L/tot)
+```
+Now that the data is ready getting it in my index
 
+```{r}
 #joining all
 bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
   select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
 
-#Label CT based on whether they have or have not gentrified
-bmore_genindex <- bmore_genindex %>%
-  mutate(normal = (genindex + 1)/2)
+#creating my final dataset
+all.acs <- left_join(all.acs, bmore_hhinc_change)%>%
+  mutate(ChangeInHighIncPct = (percentHighInc22 - percentHighInc12),
+         ChangeInLowIncPct = (percentLowInc22 - percentLowInc12))
 
-bmore_genindex <- bmore_genindex %>%
-  mutate(gent = case_when(normal >= (quantile(bmore_genindex$normal, probs = c(0.75), na.rm = TRUE)) ~ "Gentrified", TRUE ~ 'Not Gentrified'))
-
-#Check for proportion of residents who moved in prior to 2010? Owner Occupied?
-bmore_ctyomi <- get_acs(
-  geography = "tract", 
-  variables = c(tot = "B25038_002", 
-                new = "B25038_003", new = "B25038_004", new = "B25038_005",
-                old = "B25038_006", old = "B25038_007", old = "B25038_008"),
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = FALSE 
-) %>%
-  select(GEOID, variable, estimate) %>%
-  group_by(GEOID, variable) %>%
-  summarise(estimate = sum(estimate)) %>%
-  pivot_wider(names_from = variable, values_from = estimate) %>%
-  mutate(pcentnew = new/tot) %>%
-  mutate(oldnew = case_when(pcentnew >= 0.6 ~ "Majority New", TRUE ~ "Majority Old")) %>%
-  select(GEOID, oldnew)
-
-bmore_genindex <- left_join(bmore_genindex, bmore_ctyomi, by = "GEOID")
-
+#getting my index
+all.acs <- all.acs %>%
+  mutate(
+    NHHIncChangeper = HHIncChangeper / max(abs(HHIncChangeper), na.rm = TRUE),
+    NChangeInHighIncPct = ChangeInHighIncPct / max(abs(ChangeInHighIncPct), na.rm = TRUE),
+    NChangeInLowIncPct = ChangeInLowIncPct / max(abs(ChangeInLowIncPct), na.rm = TRUE)
+  )%>%
+  mutate(genindex = (0.5*NHHIncChangeper) + (0.5*NChangeInHighIncPct) - NChangeInLowIncPct)%>%
+  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.2, na.rm = TRUE)))~ 1,
+         TRUE ~ 0))
 ```
+Now joining to Shape file
 
-```{r genindex_map, warning=FALSE, message=FALSE}
+```{r}
+baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
+all.acs <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 
-#Attach geometry to the index
-bmore_ctgeo <- get_acs(
-  geography = "tract", 
-  variables = "B19001_001",
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = TRUE 
-) %>%
-  select(GEOID) %>%
-  st_transform("EPSG:4269")
-
-bmore_genindex_sf <- left_join(bmore_ctgeo, bmore_genindex, by = "GEOID")
-
-#Map
-ggplot() +
-  geom_sf(data = water_bound, fill = "steelblue") +
-  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = bmore_genindex_sf, aes(fill = normal), col = "transparent") +
-  scale_fill_gradient(
-    high = "orangered4",
-    low = "lightgoldenrod1") +
-  theme_void() +
-  xlim(-76.75, -76.48) +
-  ylim(39.2, 39.38) +
-  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Gentrification Index",
-       title = "2022 Gentrification Index",
-       subtitle = "Baltimore City, MD")
-
-#"firebrick4", "darkgoldenrod", "darkolivegreen", "royalblue4", "mediumpurple4"
-
+tm_shape(all.acs)+
+  tm_polygons(fill = "gentrify")
 ```
-```{r bmorebase_data, warning=FALSE, message=FALSE}
-
-#2022 Median Household Income
-bmore_hhinc22 <- get_acs(
-  geography = "tract", 
-  variables = "B19013_001",
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = TRUE 
-) %>%
-  select(GEOID, estimate)
-
-#2022 Majority Non-White
-bmore_nonwhite22 <- get_acs(
-  geography = "tract", 
-  variables = c(tot = "B03002_001", white = "B03002_003"),
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = TRUE
-) %>%
-  select(GEOID, variable, estimate) %>%
-  pivot_wider(names_from = variable, values_from = estimate) %>%
-  mutate(nonwhite = 1 - (white/tot))
-
-#2022 Majority Owner
-
-#2022 Median Home Value
-
-#2022 Median Rent
-
-
-```
-
-```{r bmorebase_map, warning=FALSE, message=FALSE}
-
-#2022 Median Household Income
-ggplot() +
-  geom_sf(data = water_bound, fill = "steelblue") +
-  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = bmore_hhinc22, aes(fill = estimate), col = "transparent") +
-  scale_fill_gradient(
-    high = "orangered4",
-    low = "lightgoldenrod1",
-    labels = scales::dollar) +
-  theme_void() +
-  xlim(-76.75, -76.48) +
-  ylim(39.2, 39.38) +
-  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Median Household Income",
-       title = "2022 Median Household Income",
-       subtitle = "Baltimore City, MD")
-
-#2022 Majority Non-White
-ggplot() +
-  geom_sf(data = water_bound, fill = "steelblue") +
-  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = bmore_nonwhite22, aes(fill = nonwhite), col = "transparent") +
-  scale_fill_gradient(
-    high = "orangered4",
-    low = "lightgoldenrod1",
-    labels = scales::percent) +
-  theme_void() +
-  xlim(-76.75, -76.48) +
-  ylim(39.2, 39.38) +
-  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Percent Non-White",
-       title = "2022 Race/Ethnicity",
-       subtitle = "Baltimore City, MD")
-
-#2022 Majority Owner
-
-#2022 Median Home Value
-
-#2022 Median Rent
-
-
-```
-
