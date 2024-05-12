@@ -33,15 +33,17 @@ acs_vars <- c("B01001_001E",# ACS total Pop estimate
           "B19013_001E",# Median HH Income ($)
           "B02001_002E",# People describing themselves as "white alone"
           "B06009_006E", # Total graduate or professional degree
-          "B07001_033", #moved in within same county
-          "B07001_049", #moved in from same state
-          "B07001_065", #moved in different state
-          "B07001_081", #moved from abroad
-          "B06009_005", #bachelors degree
-          "B25010_002", #owner occupied household size
-          "B25010_003", #renter occupied HH size
-          "B11016_002", #family households
-          "B11016_009") #non family households
+          "B07001_033E", #moved in within same county
+          "B07001_049E", #moved in from same state
+          "B07001_065E", #moved in different state
+          "B07001_081E", #moved from abroad
+          "B06009_005E", #bachelors degree
+          "B25010_002E", #owner occupied household size
+          "B25010_003E", #renter occupied HH size
+          "B11016_002E", #family households
+          "B11016_009E", #non family households
+          "B25064_001E", #MEDIAN GROSS RENT
+          "B25077_001E") #MEDIAN HOME VALUE
 
 #Extracting the data for 2012
 bmore_acs12 <- get_acs(
@@ -65,7 +67,9 @@ bmore_acs12 <- get_acs(
       OwnerOccupiedHouseholdSize12 = B25010_002E,
       RenterOccupiedSize12 = B25010_003E,
       FamilyHouseholds12 = B11016_002E,
-      NonFamilyHouseholds12 = B11016_009E)%>%
+      NonFamilyHouseholds12 = B11016_009E,
+      MedianRent12 = B25064_001E,
+      MedianHomeValue12 = B25077_001E)%>%
   mutate(inflation.adjHH12 = MedianHouseholdIncome12 * 1.24)%>%
   select(GEOID,NAME,ends_with("12"))
 
@@ -91,7 +95,9 @@ bmore_acs22 <- get_acs(
       OwnerOccupiedHouseholdSize22 = B25010_002E,
       RenterOccupiedSize22 = B25010_003E,
       FamilyHouseholds22 = B11016_002E,
-      NonFamilyHouseholds22 = B11016_009E)%>%
+      NonFamilyHouseholds22 = B11016_009E,
+      MedianRent22 = B25064_001E,
+      MedianHomeValue22 = B25077_001E)%>%
   select(GEOID,NAME,ends_with("22"))
 
 #one census tract has been combined in 2022. So I am adjusting this info in 2012 and joining back
@@ -114,7 +120,9 @@ changed_22 <- bmore_acs12 %>%
     RenterOccupiedSize12 = mean(RenterOccupiedSize12),
     FamilyHouseholds12 = sum(FamilyHouseholds12),
     NonFamilyHouseholds12 = sum(NonFamilyHouseholds12),
-    inflation.adjHH12 = mean(inflation.adjHH12) 
+    inflation.adjHH12 = mean(inflation.adjHH12),
+    MedianRent12 = mean(MedianRent12),
+    MedianHomeValue12 = mean(MedianRent12)
   ) %>%
   dplyr::mutate(
     NAME = "Census Tract 2806, Baltimore city, Maryland",
@@ -247,6 +255,9 @@ bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/
 #Percentage of vacant lots 
 bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
 
+#Baltimore schools
+
+school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
 ```
 =======
 ## Visualization
