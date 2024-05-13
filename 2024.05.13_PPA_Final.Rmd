@@ -652,16 +652,82 @@ walk_score <- walk_score %>%
 
 ```
 
+## Joining additional metrics
+
+```{r}
+tract_bids <- bmore_bids %>%
+  st_transform(crs = st_crs(baltimore_tracts))%>%
+  st_join(baltimore_tracts)%>%
+  group_by(GEOID)%>%
+  tally()%>%
+  st_drop_geometry()%>%
+  rename(tractbids = n)
+
+bmore_hoods <- bmore_p_lots %>%
+  select(-p_vacant)
+
+bmore_CSA_data <- bmore_p_lots %>%
+  st_drop_geometry()%>%
+  left_join(bmore_business)%>%
+  st_as_sf()
+
+bmore_school <- school_outcome %>%
+  st_centroid()
+
+bmore_CSA_data <- st_join(bmore_CSA_data, bmore_school, left = TRUE)
+
+bmore_walk <- walk_score %>%
+  st_centroid()
+
+bmore_CSA_data <- st_join(bmore_CSA_data, bmore_walk, left = TRUE)
+
+acs.hoods <- all.acs.sf %>%
+  st_transform(crs = st_crs(bmore_hoods))%>%
+  st_centroid()%>%
+  st_join(bmore_hoods, join = st_intersects)%>%
+  st_drop_geometry()%>%
+  left_join(bmore_CSA_data)%>%
+  mutate(NAME = coalesce(NAME.x, NAME.y)) %>%
+  select(-NAME.x, -NAME.y)
+
+
+acs.hoods <- acs.hoods %>%
+  select(-STATEFP,
+         -COUNTYFP,
+         -TRACTCE,
+         -NAMELSAD,
+         -MTFCC,
+         -FUNCSTAT,
+         -ALAND,
+         -AWATER,
+         -INTPTLAT,
+         -INTPTLON,
+         -NAME) %>%
+  mutate(CSA = coalesce(CSA.x, CSA.y)) %>%
+  select(-CSA.x, -CSA.y)%>%
+  st_drop_geometry()%>%
+  select(-geometry)%>%
+  left_join(tract_bids)%>%
+  mutate(across(where(is.numeric), ~replace_na(., 0)),
+         across(where(is.character), ~replace_na(., "Unknown")))
+```
+
 # Model Development & Testing
 
 ```{r modelling, warning=FALSE, message=FALSE}
 p_load(stargazer)
 
-all.acs.reg <- all.acs %>%
+all.acs.reg <- acs.hoods %>%
   select(-(ends_with("22")),
          -(ends_with("12")),
          -genindex,
-         -NAME)
+         -CSA,
+         -MovedWithinCounty17,
+         -MovedFromSameState17,
+         -MovedFromDifferentState17,
+         -MovedAbroad17,
+         OOSizePctChange,
+         ROSizePctChange)
 
 train <- all.acs.reg %>%
   sample_frac(.75)
@@ -795,7 +861,7 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
   ggplot(aes(Rate_FP, Rate_TP)) + 
   geom_point(aes(shape = pointSize)) + geom_line() + scale_shape_identity() +
   geom_abline(slope = 1, intercept = 0, size = 1.5, color = 'grey') +
-  annotation_custom(tableGrob(aucTable, rows = NULL), xmin = .65, xmax = 1, ymin = 0, ymax = .45) +
+  annotation_custom(tableGrob(aucTable, rows = NULL), xmin = .45, xmax = 1, ymin = 0, ymax = .45) +
   labs(title="ROC Curves", x="False Positive Rate", y="True Positive Rate") +
   plotTheme()+
   theme(text = element_text(family = "Times New Roman", size = 12), 
