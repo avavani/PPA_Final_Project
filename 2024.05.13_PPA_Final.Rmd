@@ -20,7 +20,7 @@ Defining and predicting gentrification is becoming more and more relevant to the
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(pacman)
-p_load(dplyr, ggplot2, , patchwork, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
+p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
 ```
 
 ```{r geography, include=FALSE, message=FALSE, warning=FALSE}
@@ -246,6 +246,7 @@ bmore_rent22 <- get_acs(
   select(GEOID, estimate)
 
 ```
+
 :::: {style="display: flex;"}
 
 ::: {}
