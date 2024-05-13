@@ -41,6 +41,10 @@ acs_variable_list.2012 <- load_variables(2012,
                                          "acs5", 
                                          cache = TRUE)
 
+acs_variable_list.2022 <- load_variables(2022, 
+                                         "acs5", 
+                                         cache = TRUE)
+
 #Picking out my variables of interest
 acs_vars <- c("B01001_001E",# ACS total Pop estimate
           "B25002_001E",# Estimate of total housing units
@@ -231,7 +235,15 @@ bmore_hv22 <- get_acs(
   select(GEOID, estimate)
 
 #2022 Median Rent
-
+bmore_rent22 <- get_acs(
+  geography = "tract", 
+  variables = "B25031_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE 
+) %>%
+  select(GEOID, estimate)
 
 ```
 :::: {style="display: flex;"}
@@ -246,8 +258,8 @@ ggplot() +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
   geom_sf(data = bmore_hhinc22, aes(fill = estimate), col = "transparent") +
   scale_fill_gradient(
-    high = "orangered4",
-    low = "lightgoldenrod1",
+    high = "#00473B",
+    low = "#A1E4CC",
     labels = scales::dollar) +
   theme_void() +
   xlim(-76.75, -76.48) +
@@ -255,46 +267,6 @@ ggplot() +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
   labs(fill = "Median Household Income",
        title = "2022 Median Household Income",
-       subtitle = "Baltimore City, MD")
-
-#2022 Majority Non-White
-ggplot() +
-  geom_sf(data = water_bound, fill = "steelblue") +
-  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = bmore_nonwhite22, aes(fill = nonwhite), col = "transparent") +
-  scale_fill_gradient(
-    high = "orangered4",
-    low = "lightgoldenrod1",
-    labels = scales::percent) +
-  theme_void() +
-  xlim(-76.75, -76.48) +
-  ylim(39.2, 39.38) +
-  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Percent Non-White",
-       title = "2022 Race/Ethnicity",
-       subtitle = "Baltimore City, MD")
-```
-
-:::
-
-::: {}
-
-```{r bmorevis_mapcol2, message=FALSE, warning=FALSE}
-#2022 Majority Owner
-ggplot() +
-  geom_sf(data = water_bound, fill = "steelblue") +
-  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = bmore_pcentoo22, aes(fill = propoo), col = "transparent") +
-  scale_fill_gradient(
-    high = "orangered4",
-    low = "lightgoldenrod1",
-    labels = scales::percent) +
-  theme_void() +
-  xlim(-76.75, -76.48) +
-  ylim(39.2, 39.38) +
-  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Percent Owner-Occupied",
-       title = "2022 Tenure",
        subtitle = "Baltimore City, MD")
 
 #2022 Median Home Value
@@ -314,7 +286,52 @@ ggplot() +
        title = "2022 Median Home Value",
        subtitle = "Baltimore City, MD")
 
+```
+
+:::
+
+::: {}
+
+```{r bmorevis_mapcol2, message=FALSE, warning=FALSE}
+
+#2022 Majority Non-White
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_nonwhite22, aes(fill = nonwhite), col = "transparent") +
+  scale_fill_gradient(
+    high = "#4F0070",
+    low = "#A169E6",
+    labels = scales::percent) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Percent Non-White",
+       title = "2022 Race/Ethnicity",
+       subtitle = "Baltimore City, MD")
+
 #2022 Median Rent
+
+
+#2022 Majority Owner
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_pcentoo22, aes(fill = propoo), col = "transparent") +
+  scale_fill_gradient(
+    high = "#1E1670",
+    low = "#628CE5",
+    labels = scales::percent) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Percent Owner-Occupied",
+       title = "2022 Tenure",
+       subtitle = "Baltimore City, MD")
+
+
 
 
 ```
