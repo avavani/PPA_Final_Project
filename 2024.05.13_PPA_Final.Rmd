@@ -178,7 +178,7 @@ all.acs <- bmore_acs17 %>%
 ```
 
 # About Baltimore City
-Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 people (2020 Census).
+Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 people (2020 Census). An incredibly historic city, though Baltimore was once full of rigorous industry, unbridled American patriotism, and wealth, its late 20th century reality was plagued by extreme disinvestment, high crime, and white flight.
 
 ```{r bmorevis_data, message=FALSE, warning=FALSE}
 
@@ -308,6 +308,8 @@ ggplot() +
 #2022 Median Rent
 
 ```
+
+Baltimore is less than an hour North of Annapolis, MD (the state capital) and Washington, DC as the crow drives. Baltimore/Washington International Airport (BWI) does not lie within Baltimore City boundaries.
 
 misplaced below?
 
