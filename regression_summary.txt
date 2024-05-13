@@ -5,29 +5,29 @@ Regression Results
                              -----------------------------------
                                           gentrify              
 ----------------------------------------------------------------
-TotalPopulation12                 0.000 (-223.391, 223.391)     
-TotalHousingUnits12              -0.000 (-427.200, 427.200)     
-VacantHousingUnits12              0.000 (-606.183, 606.183)     
-MedianHouseholdIncome12             0.000 (-8.185, 8.185)       
-WhiteAlone12                       0.000 (-98.405, 98.405)      
-GradProfessionalDegree12          0.000 (-401.005, 401.005)     
-MovedWithinCounty12               0.000 (-376.483, 376.483)     
-MovedFromSameState12             -0.000 (-810.602, 810.602)     
-MovedFromDifferentState12        -0.000 (-878.033, 878.033)     
-MovedAbroad12                  -0.000 (-1,480.522, 1,480.522)   
-BachelorsDegree12                -0.000 (-571.998, 571.998)     
-OwnerOccupiedHouseholdSize12 -0.000 (-128,187.900, 128,187.900) 
-RenterOccupiedSize12         -0.000 (-138,445.600, 138,445.600) 
-FamilyHouseholds12               -0.000 (-767.082, 767.082)     
+TotalPopulation12                -0.000 (-248.308, 248.308)     
+TotalHousingUnits12               0.000 (-446.091, 446.091)     
+VacantHousingUnits12             -0.000 (-602.523, 602.523)     
+MedianHouseholdIncome12             0.000 (-8.866, 8.866)       
+WhiteAlone12                      0.000 (-106.657, 106.657)     
+GradProfessionalDegree12         -0.000 (-515.891, 515.891)     
+MovedWithinCounty12              -0.000 (-357.285, 357.285)     
+MovedFromSameState12              0.000 (-786.764, 786.764)     
+MovedFromDifferentState12         0.000 (-878.345, 878.345)     
+MovedAbroad12                   0.000 (-1,485.487, 1,485.487)   
+BachelorsDegree12                -0.000 (-659.318, 659.318)     
+OwnerOccupiedHouseholdSize12  0.000 (-166,946.200, 166,946.200) 
+RenterOccupiedSize12          0.000 (-138,441.300, 138,441.300) 
+FamilyHouseholds12               -0.000 (-779.099, 779.099)     
 NonFamilyHouseholds12                                           
-MedianRent12                      0.000 (-369.134, 369.134)     
-MedianHomeValue12                  -0.000 (-1.319, 1.319)       
+MedianRent12                     -0.000 (-380.001, 380.001)     
+MedianHomeValue12                  -0.000 (-1.425, 1.425)       
 inflation.adjHH12                                               
-percentHighInc12              0.000 (-783,479.100, 783,479.100) 
+percentHighInc12              0.000 (-761,068.000, 761,068.000) 
 percentLowInc12                                                 
-Constant                     -26.566 (-652,764.700, 652,711.500)
+Constant                     -26.566 (-729,634.400, 729,581.300)
 ----------------------------------------------------------------
-Observations                                 146                
+Observations                                 147                
 Log Likelihood                             -0.000               
 Akaike Inf. Crit.                          36.000               
 ================================================================
