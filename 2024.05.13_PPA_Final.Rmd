@@ -18,9 +18,9 @@ output:
 Defining and predicting gentrification is becoming more and more relevant to the average person as neighborhood residents become more concerned about getting priced out of their communities. Once something that could only be observed in hindsight, anticipating gentrification and attempting to prevent its disparate effects has become the subject of activism and counter-lobbying efforts. This report attempts to determine if gentrification can be correctly identified in Baltimore City, Maryland based on neighborhood characteristics that the average person can observe.
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 library(pacman)
-p_load(dplyr, ggplot2, , patchwork, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
+p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
 ```
 
 ```{r geography, include=FALSE, message=FALSE, warning=FALSE}
@@ -184,7 +184,7 @@ all.acs <- bmore_acs17 %>%
 # About Baltimore City
 Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 people (2020 Census). An incredibly historic city, though Baltimore was once full of rigorous industry, unbridled American patriotism, and wealth, its late 20th century reality was plagued by extreme disinvestment, high crime, and white flight.
 
-```{r bmorevis_data, message=FALSE, warning=FALSE}
+```{r bmorevis_data}
 
 #2022 Median Household Income
 bmore_hhinc22 <- get_acs(
@@ -246,6 +246,7 @@ bmore_rent22 <- get_acs(
   select(GEOID, estimate)
 
 ```
+
 :::: {style="display: flex;"}
 
 ::: {}
@@ -312,26 +313,38 @@ ggplot() +
        subtitle = "Baltimore City, MD")
 
 #2022 Median Rent
-
-
-#2022 Majority Owner
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = bmore_pcentoo22, aes(fill = propoo), col = "transparent") +
+  geom_sf(data = bmore_rent22, aes(fill = estimate), col = "transparent") +
   scale_fill_gradient(
-    high = "#1E1670",
-    low = "#628CE5",
-    labels = scales::percent) +
+    high = "#344713",
+    low = "#C9E5A8",
+    labels = scales::dollar) +
   theme_void() +
   xlim(-76.75, -76.48) +
   ylim(39.2, 39.38) +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Percent Owner-Occupied",
-       title = "2022 Tenure",
+  labs(fill = "Median Gross Rent",
+       title = "2022 Median Gross Rent",
        subtitle = "Baltimore City, MD")
 
-
+#2022 Majority Owner
+# ggplot() +
+#   geom_sf(data = water_bound, fill = "steelblue") +
+#   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+#   geom_sf(data = bmore_pcentoo22, aes(fill = propoo), col = "transparent") +
+#   scale_fill_gradient(
+#     high = "#1E1670",
+#     low = "#628CE5",
+#     labels = scales::percent) +
+#   theme_void() +
+#   xlim(-76.75, -76.48) +
+#   ylim(39.2, 39.38) +
+#   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+#   labs(fill = "Percent Owner-Occupied",
+#        title = "2022 Tenure",
+#        subtitle = "Baltimore City, MD")
 
 
 ```
@@ -401,7 +414,7 @@ bmore_ctmedhhinc22 <- get_acs(
   mutate(percentHighInc22 = H/tot, percentLowInc22 = L/tot)
 ```
 
-```{r makingindex}
+```{r makingindex, eval=FALSE, include=FALSE}
 #joining all
 bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
   select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
@@ -423,16 +436,13 @@ all.acs <- all.acs %>%
          TRUE ~ 0))
 ```
 
-```{r joiningviz1}
+```{r joiningviz1, eval=FALSE, include=FALSE}
 baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
 all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 
 tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
-
-# Data Collection
-Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
 
 ```{r bmore_data, message=FALSE, warning=FALSE}
 
@@ -457,7 +467,7 @@ walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest
 
 ```
 
-```{r bmore_clean_data, message=FALSE, warning=FALSE}
+```{r bmore_clean_data, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 #percentage of vacant lots 
 bmore_p_lots <- bmore_p_lots %>%
   select(CSA2020, vacant21, geometry) %>%
@@ -511,8 +521,12 @@ all_variables <- st_join(all_variables, tracts, join = st_intersects,
 
 ```
 
+misplaced above?
+
 # Defining Gentrification
-To create a Gentrification Index, we calculate the proportion of low and high income households for each census tract in 2022 and 2012. We subtract the change in low income proportion of households from the high income proportion over the ten years.
+We define our Gentrification Index per CT as [ (∆ High Income Proportion) - (∆ Low Income Proportion) ]. The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification. 
+
+This index was then normalized to reflect entirely positive numbers between 0 and 1. But did we take the 30th percentile of all the results or of the ones that count as gentrified? I think we should take a percentile of the ones that appear to be above 0 before the normalization. Flag to discuss.
 
 ```{r callingincomedata2}
 #Getting population by Income numbers
@@ -596,6 +610,7 @@ tm_shape(all.acs.sf)+
 ```
 
 # Data Collection
+For testing the ability to predict gentrification, input features that could be observed by eye were sourced, cleaned, and used in the model. Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
 
 ```{r bmore_data2, message=FALSE, warning=FALSE}
 
