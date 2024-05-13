@@ -515,7 +515,7 @@ all.acs <- left_join(all.acs, bmore_hhinc_change)%>%
          ChangeInLowIncPct = (percentLowInc22 - percentLowInc12))
 
 all.acs <- all.acs%>%
-  mutate(genindex = ChangeInHighIncPct + abs(ChangeInLowIncPct))%>%
+  mutate(genindex = ChangeInLowIncPct)%>%
   mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.70, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
@@ -581,7 +581,7 @@ walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest
 ## Joining additional metrics
 
 ```{r}
-p_load(nngeo,FNN,tibble)
+p_load(nngeo,FNN,tibble, caret)
 bmore_hoods <- bmore_p_lots %>%
   select(-p_vacant)
 
