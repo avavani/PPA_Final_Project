@@ -1,56 +1,52 @@
 
 Regression Results
-================================================================
-                                     Dependent variable:        
-                             -----------------------------------
-                                          gentrify              
-----------------------------------------------------------------
-TotalPopulation17                 0.000 (-123.996, 123.996)     
-TotalHousingUnits17              -0.000 (-355.184, 355.184)     
-VacantHousingUnits17              0.000 (-720.340, 720.340)     
-MedianHouseholdIncome17             0.000 (-6.251, 6.251)       
-WhiteAlone17                     -0.000 (-121.103, 121.103)     
-GradProfessionalDegree17         -0.000 (-459.652, 459.652)     
-BachelorsDegree17                -0.000 (-743.562, 743.562)     
-OwnerOccupiedHouseholdSize17  0.000 (-146,783.700, 146,783.700) 
-RenterOccupiedSize17         -0.000 (-163,481.200, 163,481.200) 
-FamilyHouseholds17                0.000 (-641.995, 641.995)     
-NonFamilyHouseholds17                                           
-MedianRent17                      0.000 (-310.661, 310.661)     
-MedianHomeValue17                   0.000 (-1.631, 1.631)       
-inflation.adjHH17                                               
-PopChangePct                   -0.000 (-8,978.752, 8,978.752)   
-HUnitsPctChange                0.000 (-11,565.650, 11,565.650)  
-VacantUnitsPctChange           -0.000 (-1,883.000, 1,883.000)   
-RentPctChange                   0.000 (-3,812.400, 3,812.400)   
-HomeValuePctChange              0.000 (-1,758.045, 1,758.045)   
-IncPctChange                    0.000 (-2,593.749, 2,593.749)   
-WhiteAlonePctChange               0.000 (-253.021, 253.021)     
-GradPctChange                     0.000 (-346.862, 346.862)     
-CountyWWMovePctChange           0.000 (-1,171.211, 1,171.211)   
-SStateMovePctChange              -0.000 (-107.192, 107.192)     
-DiffStateMovePctChange           -0.000 (-280.567, 280.567)     
-AbroadMovePctChange               -0.000 (-25.582, 25.582)      
-BachelorsPctChange                0.000 (-980.009, 980.009)     
-OOSizePctChange                -0.000 (-5,444.070, 5,444.070)   
-ROSizePctChange                 0.000 (-6,420.285, 6,420.285)   
-FamHHPctChange                 -0.000 (-3,340.509, 3,340.509)   
-NonFamHHPctChange              -0.000 (-3,669.485, 3,669.485)   
-p_vacant                        0.000 (-9,220.972, 9,220.972)   
-business_count                   -0.000 (-285.697, 285.697)     
-changebiz                         0.000 (-625.603, 625.603)     
-p_students                     -0.000 (-5,719.089, 5,719.089)   
-walk_score                      0.000 (-3,635.291, 3,635.291)   
-changewalk                    -0.000 (-19,476.860, 19,476.860)  
-collegedist                        0.000 (-68.943, 68.943)      
-tractbids                       0.000 (-5,529.144, 5,529.144)   
-Constant                     -26.566 (-434,277.600, 434,224.500)
-----------------------------------------------------------------
-Observations                                 176                
-Log Likelihood                             -0.000               
-Akaike Inf. Crit.                          76.000               
-================================================================
-Significance levels:         *p<0.05; **p<0.01; ***p<0.001      
-                             *** p<0.001                        
-                             ** p<0.01                          
-                             * p<0.05                           
+==========================================================
+                                  Dependent variable:     
+                             -----------------------------
+                                       gentrify           
+----------------------------------------------------------
+TotalPopulation17               -0.001 (-0.002, 0.001)    
+TotalHousingUnits17              0.001 (-0.003, 0.005)    
+VacantHousingUnits17            -0.0003 (-0.007, 0.007)   
+WhiteAlone17                    0.001 (-0.0005, 0.002)    
+GradProfessionalDegree17        0.006 (-0.0001, 0.012)    
+BachelorsDegree17               -0.006 (-0.014, 0.002)    
+OwnerOccupiedHouseholdSize17     0.614 (-0.688, 1.916)    
+RenterOccupiedSize17             0.841 (-0.286, 1.968)    
+FamilyHouseholds17               0.001 (-0.006, 0.008)    
+NonFamilyHouseholds17                                     
+MedianHomeValue17            -0.00001 (-0.00002, 0.00001) 
+inflation.adjHH17             -0.00001 (-0.0001, 0.00005) 
+PopChangePct                    -0.043 (-0.145, 0.059)    
+HUnitsPctChange                  0.145* (0.027, 0.262)    
+VacantUnitsPctChange             0.002 (-0.015, 0.019)    
+IncPctChange                    -0.002 (-0.027, 0.023)    
+WhiteAlonePctChange              0.003 (-0.002, 0.008)    
+GradPctChange                   -0.0002 (-0.004, 0.003)   
+CountyWWMovePctChange            0.007 (-0.008, 0.021)    
+SStateMovePctChange             -0.001 (-0.003, 0.001)    
+DiffStateMovePctChange          -0.001 (-0.003, 0.002)    
+AbroadMovePctChange             -0.003 (-0.008, 0.003)    
+BachelorsPctChange               0.001 (-0.009, 0.011)    
+OOSizePctChange                  0.044 (-0.003, 0.091)    
+ROSizePctChange                  0.056* (0.006, 0.106)    
+FamHHPctChange                  -0.026 (-0.097, 0.044)    
+NonFamHHPctChange               -0.002 (-0.048, 0.044)    
+p_vacant                        -0.051 (-0.159, 0.058)    
+business_count                  -0.004 (-0.010, 0.001)    
+changebiz                        0.007 (-0.003, 0.016)    
+p_students                      -0.069 (-0.174, 0.036)    
+walk_score                       0.026 (-0.012, 0.063)    
+changewalk                      -0.048 (-0.230, 0.134)    
+collegedist                     0.0001 (-0.0004, 0.001)   
+tractbids                        0.001 (-0.061, 0.062)    
+Constant                        -2.313 (-6.426, 1.801)    
+----------------------------------------------------------
+Observations                              176             
+Log Likelihood                          -49.326           
+Akaike Inf. Crit.                       168.651           
+==========================================================
+Significance levels:         *p<0.05; **p<0.01; ***p<0.001
+                             *** p<0.001                  
+                             ** p<0.01                    
+                             * p<0.05                     

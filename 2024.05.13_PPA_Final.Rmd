@@ -23,7 +23,7 @@ library(pacman)
 p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
 ```
 
-```{r geography, include=FALSE, message=FALSE, warning=FALSE}
+```{r geography, include=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
 
 options(tigris_use_cache = TRUE)
 
@@ -36,7 +36,7 @@ water_bound <- st_as_sfc(st_bbox(md_bound), crs = "EPSG:4269")
 ```
 
 ```{r callingacsdata, include=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
-#Getting my ACS Variable LIst
+#Getting my ACS Variable List
 acs_variable_list.2012 <- load_variables(2012, 
                                          "acs5", 
                                          cache = TRUE)
@@ -249,9 +249,6 @@ bmore_rent22 <- get_acs(
 
 ```
 
-:::: {style="display: flex;"}
-
-::: {}
 
 ```{r bmorevis_mapcol1, message=FALSE, warning=FALSE}
  
@@ -291,9 +288,6 @@ ggplot() +
 
 ```
 
-:::
-
-::: {}
 
 ```{r bmorevis_mapcol2, message=FALSE, warning=FALSE}
 
@@ -351,9 +345,7 @@ ggplot() +
 
 ```
 
-:::
 
-::::
 
 Baltimore is less than an hour North of Annapolis, MD (the state capital) and Washington, DC as the crow drives. Baltimore/Washington International Airport (BWI) does not lie within Baltimore City boundaries.
 
@@ -416,7 +408,7 @@ bmore_ctmedhhinc22 <- get_acs(
   mutate(percentHighInc22 = H/tot, percentLowInc22 = L/tot)
 ```
 
-```{r makingindex, eval=FALSE, include=FALSE}
+```{r makingindex, include=FALSE}
 #joining all
 bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
   select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
@@ -435,7 +427,7 @@ mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.80, na.rm 
          TRUE ~ 0))
 ```
 
-```{r joiningviz1, eval=FALSE, include=FALSE}
+```{r joiningviz1, include=FALSE}
 baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
 all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 
@@ -450,87 +442,6 @@ misplaced above?
 We define our Gentrification Index per CT as [ (∆ High Income Proportion) - (∆ Low Income Proportion) ]. The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification. 
 
 This index was then normalized to reflect entirely positive numbers between 0 and 1. But did we take the 30th percentile of all the results or of the ones that count as gentrified? I think we should take a percentile of the ones that appear to be above 0 before the normalization. Flag to discuss.
-
-```{r callingincomedata2, cache=TRUE}
-#Getting population by Income numbers
-bmore_ctmedhhinc12 <- get_acs(
-  geography = "tract", 
-  variables = c(tot = "B19001_001", 
-                L = "B19001_002", L = "B19001_003", L = "B19001_004", L = "B19001_005", L = "B19001_006",
-                H = "B19001_007", H = "B19001_008", H = "B19001_009", H = "B19001_010", H = "B19001_011", 
-                H = "B19001_012", H = "B19001_013", H = "B19001_014", H = "B19001_015", H = "B19001_016", 
-                H = "B19001_017"),
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2012,
-  geometry = FALSE 
-) %>%
-  select(GEOID, variable, estimate) %>%
-  rename(est12 = estimate, var12 = variable) %>%
-  group_by(GEOID, var12) %>%
-  summarise(est12 = sum(est12)) %>%
-  pivot_wider(names_from = var12, values_from = est12) %>%
-  mutate(percentHighInc12 = H/tot, percentLowInc12 = L/tot)
-
-#adjusting for joined census tracts
-changed_22Inc <- bmore_ctmedhhinc12 %>%
-  filter(GEOID %in% c("24510180100", "24510180200")) %>%
-  ungroup() %>%
-  summarize(H = sum(H), L = sum(L), tot = sum(tot)) %>%
-  mutate(percentHighInc12 = H / tot,
-         percentLowInc12 = L / tot) %>%
-  mutate(GEOID = "24510280600")
-
-#joining info back to 2012
-bmore_ctmedhhinc12 <- bmore_ctmedhhinc12 %>%
-  ungroup()%>%
-  filter(!(GEOID %in% c("24510180100", "24510180200"))) %>%
-  bind_rows(changed_22Inc)
-
-#getting HH income for 2022
-bmore_ctmedhhinc22 <- get_acs(
-  geography = "tract", 
-  variables = c(tot = "B19001_001", 
-                L = "B19001_002", L = "B19001_003", L = "B19001_004", L = "B19001_005", L = "B19001_006",
-                L = "B19001_007", L = "B19001_008", L = "B19001_009", H = "B19001_010", H = "B19001_011", 
-                H = "B19001_012", H = "B19001_013", H = "B19001_014", H = "B19001_015", H = "B19001_016", 
-                H = "B19001_017"),
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = FALSE 
-) %>%
-  select(GEOID, variable, estimate) %>%
-  rename(est22 = estimate, var22 = variable) %>%
-  group_by(GEOID, var22) %>%
-  summarise(est22 = sum(est22)) %>%
-  pivot_wider(names_from = var22, values_from = est22) %>%
-  mutate(percentHighInc22 = H/tot, percentLowInc22 = L/tot)
-```
-
-```{r makingindex2}
-#joining all
-bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
-  select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
-
-#creating my final dataset
-all.acs <- left_join(all.acs, bmore_hhinc_change)%>%
-  mutate(ChangeInHighIncPct = (percentHighInc22 - percentHighInc12),
-         ChangeInLowIncPct = (percentLowInc22 - percentLowInc12))
-
-all.acs <- all.acs%>%
-  mutate(genindex = ChangeInLowIncPct)%>%
-  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.70, na.rm = TRUE)))~ 1,
-         TRUE ~ 0))
-```
-
-```{r joiningviz12}
-baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
-all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
-
-tm_shape(all.acs.sf)+
-  tm_polygons(fill = "gentrify")
-```
 
 # Data Collection
 For testing the ability to predict gentrification, input features that could be observed by eye were sourced, cleaned, and used in the model. Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
@@ -656,8 +567,10 @@ all.acs.reg <- acs.hoods %>%
          -MovedFromSameState17,
          -MovedFromDifferentState17,
          -MovedAbroad17,
-         OOSizePctChange,
-         ROSizePctChange)
+         -RentPctChange,
+         -HomeValuePctChange,
+         -MedianRent17,
+         -MedianHouseholdIncome17)
 
 train <- all.acs.reg %>%
   sample_frac(.75)
