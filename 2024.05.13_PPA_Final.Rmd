@@ -161,156 +161,7 @@ all.acs <- bmore_acs12 %>%
 ```
 
 # About Baltimore City
-
-Now we are working on getting our gentrification index. First, we want to calculate the percentage of low and high income people for census tracts in both years.
-
-```{r callingincomedata}
-#Getting population by Income numbers
-bmore_ctmedhhinc12 <- get_acs(
-  geography = "tract", 
-  variables = c(tot = "B19001_001", 
-                L = "B19001_002", L = "B19001_003", L = "B19001_004", L = "B19001_005", L = "B19001_006",
-                H = "B19001_007", H = "B19001_008", H = "B19001_009", H = "B19001_010", H = "B19001_011", 
-                H = "B19001_012", H = "B19001_013", H = "B19001_014", H = "B19001_015", H = "B19001_016", 
-                H = "B19001_017"),
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2012,
-  geometry = FALSE 
-) %>%
-  select(GEOID, variable, estimate) %>%
-  rename(est12 = estimate, var12 = variable) %>%
-  group_by(GEOID, var12) %>%
-  summarise(est12 = sum(est12)) %>%
-  pivot_wider(names_from = var12, values_from = est12) %>%
-  mutate(percentHighInc12 = H/tot, percentLowInc12 = L/tot)
-
-#adjusting for joined census tracts
-changed_22Inc <- bmore_ctmedhhinc12 %>%
-  filter(GEOID %in% c("24510180100", "24510180200")) %>%
-  ungroup() %>%
-  summarize(H = sum(H), L = sum(L), tot = sum(tot)) %>%
-  mutate(percentHighInc12 = H / tot,
-         percentLowInc12 = L / tot) %>%
-  mutate(GEOID = "24510280600")
-
-#joining info back to 2012
-bmore_ctmedhhinc12 <- bmore_ctmedhhinc12 %>%
-  ungroup()%>%
-  filter(!(GEOID %in% c("24510180100", "24510180200"))) %>%
-  bind_rows(changed_22Inc)
-
-#getting HH income for 2022
-bmore_ctmedhhinc22 <- get_acs(
-  geography = "tract", 
-  variables = c(tot = "B19001_001", 
-                L = "B19001_002", L = "B19001_003", L = "B19001_004", L = "B19001_005", L = "B19001_006",
-                L = "B19001_007", L = "B19001_008", L = "B19001_009", H = "B19001_010", H = "B19001_011", 
-                H = "B19001_012", H = "B19001_013", H = "B19001_014", H = "B19001_015", H = "B19001_016", 
-                H = "B19001_017"),
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = FALSE 
-) %>%
-  select(GEOID, variable, estimate) %>%
-  rename(est22 = estimate, var22 = variable) %>%
-  group_by(GEOID, var22) %>%
-  summarise(est22 = sum(est22)) %>%
-  pivot_wider(names_from = var22, values_from = est22) %>%
-  mutate(percentHighInc22 = H/tot, percentLowInc22 = L/tot)
-```
-Now that the data is ready getting it in my index
-
-```{r makingindex}
-#joining all
-bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
-  select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
-
-#creating my final dataset
-all.acs <- left_join(all.acs, bmore_hhinc_change)%>%
-  mutate(ChangeInHighIncPct = (percentHighInc22 - percentHighInc12),
-         ChangeInLowIncPct = (percentLowInc22 - percentLowInc12))
-
-#getting my index
-all.acs <- all.acs %>%
-  mutate(
-    NHHIncChangeper = HHIncChangeper / max(abs(HHIncChangeper), na.rm = TRUE),
-    NChangeInHighIncPct = ChangeInHighIncPct / max(abs(ChangeInHighIncPct), na.rm = TRUE),
-    NChangeInLowIncPct = ChangeInLowIncPct / max(abs(ChangeInLowIncPct), na.rm = TRUE)
-  )%>%
-  mutate(genindex = NChangeInHighIncPct - (NChangeInLowIncPct))%>%
-  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.75, na.rm = TRUE)))~ 1,
-         TRUE ~ 0))
-```
-Now joining to Shape file
-
-```{r joiningviz1}
-baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
-all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
-
-tm_shape(all.acs.sf)+
-  tm_polygons(fill = "gentrify")
-```
-
-
-
-```{r bmore_data, message=FALSE, warning=FALSE}
-
-#Open-Bid List - Vacants to Value 
-bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")
-
-#Universities & colleges? 
-bmore_colleges <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Universities_and_Colleges/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-#Businesses by community statistical areas 
-bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiind/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
- 
-#Percentage of vacant lots 
-bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-
-#Note to self (Tina) - make new combined features file 
-
-
-#Baltimore schools
-
-school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-#walk score
-walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wlksc/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-```
-
-```{r bmore_clean_data, message=FALSE, warning=FALSE}
-#percentage of vacant lots 
-bmore_p_lots <- bmore_p_lots %>%
-  select(CSA2020, vacant21, geometry) %>%
-  rename(CSA = CSA2020, 
-         p_vacant = vacant21)
-
-#number of businesses 
-bmore_business <- bmore_business %>%
-  select(CSA2020, neiind21, geometry) %>%
-  rename(CSA = CSA2020, 
-         business_count = neiind21)
-
-#percentage of 3rd grade students who met math test target 
-school_outcome <- school_outcome %>%
-  select(CSA2010, pread317, geometry) %>%
-  rename(CSA = CSA2010,
-         p_students = pread317)
-
-#walk score
-walk_score <- walk_score %>%
-  select(CSA2010, wlksc17, geometry) %>%
-  rename(CSA = CSA2010,
-         walk_score = wlksc17)
-
-
-```
-
-## Visualization
+Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 people (2020 Census). 
 
 ```{r bmorevis_data, message=FALSE, warning=FALSE}
 
@@ -440,6 +291,154 @@ ggplot() +
 #2022 Median Rent
 
 ```
+
+
+#Defining Gentrification
+To create a Gentrification Index, we calculate the proportion of low and high income households for each census tract in 2022 and 2012. We subtract the change in low income proportion of households from the high income proportion.
+
+```{r callingincomedata}
+#Getting population by Income numbers
+bmore_ctmedhhinc12 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B19001_001", 
+                L = "B19001_002", L = "B19001_003", L = "B19001_004", L = "B19001_005", L = "B19001_006",
+                H = "B19001_007", H = "B19001_008", H = "B19001_009", H = "B19001_010", H = "B19001_011", 
+                H = "B19001_012", H = "B19001_013", H = "B19001_014", H = "B19001_015", H = "B19001_016", 
+                H = "B19001_017"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2012,
+  geometry = FALSE 
+) %>%
+  select(GEOID, variable, estimate) %>%
+  rename(est12 = estimate, var12 = variable) %>%
+  group_by(GEOID, var12) %>%
+  summarise(est12 = sum(est12)) %>%
+  pivot_wider(names_from = var12, values_from = est12) %>%
+  mutate(percentHighInc12 = H/tot, percentLowInc12 = L/tot)
+
+#adjusting for joined census tracts
+changed_22Inc <- bmore_ctmedhhinc12 %>%
+  filter(GEOID %in% c("24510180100", "24510180200")) %>%
+  ungroup() %>%
+  summarize(H = sum(H), L = sum(L), tot = sum(tot)) %>%
+  mutate(percentHighInc12 = H / tot,
+         percentLowInc12 = L / tot) %>%
+  mutate(GEOID = "24510280600")
+
+#joining info back to 2012
+bmore_ctmedhhinc12 <- bmore_ctmedhhinc12 %>%
+  ungroup()%>%
+  filter(!(GEOID %in% c("24510180100", "24510180200"))) %>%
+  bind_rows(changed_22Inc)
+
+#getting HH income for 2022
+bmore_ctmedhhinc22 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B19001_001", 
+                L = "B19001_002", L = "B19001_003", L = "B19001_004", L = "B19001_005", L = "B19001_006",
+                L = "B19001_007", L = "B19001_008", L = "B19001_009", H = "B19001_010", H = "B19001_011", 
+                H = "B19001_012", H = "B19001_013", H = "B19001_014", H = "B19001_015", H = "B19001_016", 
+                H = "B19001_017"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = FALSE 
+) %>%
+  select(GEOID, variable, estimate) %>%
+  rename(est22 = estimate, var22 = variable) %>%
+  group_by(GEOID, var22) %>%
+  summarise(est22 = sum(est22)) %>%
+  pivot_wider(names_from = var22, values_from = est22) %>%
+  mutate(percentHighInc22 = H/tot, percentLowInc22 = L/tot)
+```
+
+```{r makingindex}
+#joining all
+bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
+  select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
+
+#creating my final dataset
+all.acs <- left_join(all.acs, bmore_hhinc_change)%>%
+  mutate(ChangeInHighIncPct = (percentHighInc22 - percentHighInc12),
+         ChangeInLowIncPct = (percentLowInc22 - percentLowInc12))
+
+#getting my index
+all.acs <- all.acs %>%
+  mutate(
+    NHHIncChangeper = HHIncChangeper / max(abs(HHIncChangeper), na.rm = TRUE),
+    NChangeInHighIncPct = ChangeInHighIncPct / max(abs(ChangeInHighIncPct), na.rm = TRUE),
+    NChangeInLowIncPct = ChangeInLowIncPct / max(abs(ChangeInLowIncPct), na.rm = TRUE)
+  )%>%
+  mutate(genindex = NChangeInHighIncPct - (NChangeInLowIncPct))%>%
+  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.75, na.rm = TRUE)))~ 1,
+         TRUE ~ 0))
+```
+
+```{r joiningviz1}
+baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
+all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
+
+tm_shape(all.acs.sf)+
+  tm_polygons(fill = "gentrify")
+```
+
+```{r bmore_data, message=FALSE, warning=FALSE}
+
+#Open-Bid List - Vacants to Value 
+bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")
+
+#Universities & colleges? 
+bmore_colleges <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Universities_and_Colleges/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+
+#Businesses by community statistical areas 
+bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiind/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+ 
+#Percentage of vacant lots 
+bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+
+
+#Note to self (Tina) - make new combined features file 
+
+
+#Baltimore schools
+
+school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+
+#walk score
+walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wlksc/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+
+```
+
+```{r bmore_clean_data, message=FALSE, warning=FALSE}
+#percentage of vacant lots 
+bmore_p_lots <- bmore_p_lots %>%
+  select(CSA2020, vacant21, geometry) %>%
+  rename(CSA = CSA2020, 
+         p_vacant = vacant21)
+
+#number of businesses 
+bmore_business <- bmore_business %>%
+  select(CSA2020, neiind21, geometry) %>%
+  rename(CSA = CSA2020, 
+         business_count = neiind21)
+
+#percentage of 3rd grade students who met math test target 
+school_outcome <- school_outcome %>%
+  select(CSA2010, pread317, geometry) %>%
+  rename(CSA = CSA2010,
+         p_students = pread317)
+
+#walk score
+walk_score <- walk_score %>%
+  select(CSA2010, wlksc17, geometry) %>%
+  rename(CSA = CSA2010,
+         walk_score = wlksc17)
+
+
+```
+
+## Visualization
 
 
 ## Moving to Modelling
