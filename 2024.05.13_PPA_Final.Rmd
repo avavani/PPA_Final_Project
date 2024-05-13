@@ -188,7 +188,7 @@ all.acs <- bmore_acs17 %>%
 # About Baltimore City
 Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 people (2020 Census). An incredibly historic city, though Baltimore was once full of rigorous industry, unbridled American patriotism, and wealth, its late 20th century reality was plagued by extreme disinvestment, high crime, and white flight.
 
-```{r bmorevis_data}
+```{r bmorevis_data, message=FALSE, warning=FALSE}
 
 #2022 Median Household Income
 bmore_hhinc22 <- get_acs(
@@ -251,6 +251,9 @@ bmore_rent22 <- get_acs(
 
 ```
 
+:::: {style="display: flex;"}
+
+::: {}
 
 ```{r bmorevis_mapcol1, message=FALSE, warning=FALSE}
  
@@ -290,6 +293,9 @@ ggplot() +
 
 ```
 
+:::
+
+::: {}
 
 ```{r bmorevis_mapcol2, message=FALSE, warning=FALSE}
 
@@ -347,11 +353,19 @@ ggplot() +
 
 ```
 
+:::
 
+::::
 
 Baltimore is less than an hour North of Annapolis, MD (the state capital) and Washington, DC as the crow drives. Baltimore/Washington International Airport (BWI) does not lie within Baltimore City boundaries.
 
-misplaced below?
+# Defining Gentrification
+We define our Gentrification Index per CT as follows:
+
+GI = (∆ Low Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value) 
+
+The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification. 
+
 
 ```{r callingincomedata}
 #Getting population by Income numbers
@@ -437,14 +451,6 @@ all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")%>%
 tm_shape(all.acs.sf) +
   tm_polygons(col = "gentrify")
 ```
-
-
-misplaced above?
-
-# Defining Gentrification
-We define our Gentrification Index per CT as [ (∆ High Income Proportion) - (∆ Low Income Proportion) ]. The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification. 
-
-This index was then normalized to reflect entirely positive numbers between 0 and 1. But did we take the 30th percentile of all the results or of the ones that count as gentrified? I think we should take a percentile of the ones that appear to be above 0 before the normalization. Flag to discuss.
 
 # Data Collection
 For testing the ability to predict gentrification, input features that could be observed by eye were sourced, cleaned, and used in the model. Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
