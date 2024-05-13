@@ -269,10 +269,6 @@ bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/
 #Percentage of vacant lots 
 bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
 
-
-#Note to self (Tina) - make new combined features file 
-
-
 #Baltimore schools
 
 school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
@@ -307,6 +303,32 @@ walk_score <- walk_score %>%
   rename(CSA = CSA2010,
          walk_score = wlksc17)
 
+#all variables 
+variables1 <- bmore_p_lots %>%
+  st_drop_geometry() %>%
+  full_join(bmore_business) %>%
+  st_as_sf() %>%
+  st_transform(variables1,
+               crs = st_crs(baltimore_tracts))
+
+#CSA names are different for schools and walk score so I'm combining them separately 
+variables2 <- school_outcome %>%
+  st_drop_geometry() %>%
+  full_join(walk_score) %>%
+  st_as_sf() %>%
+  st_transform(variables2,
+               crs = st_crs(baltimore_tracts))
+
+all_variables <- st_join(variables1, variables2) #I think this is where things go left 
+
+tracts <- baltimore_tracts %>%
+  select(GEOID, geometry) 
+
+all_variables <- st_join(all_variables, tracts, join = st_intersects, 
+                         left=FALSE)
+
+#the geographies are all over the place, will have to clean - maybe areal interpolation? 
+#based on the joins, a lot of the CSAs encompass multiple tracts, which makes sense since there's 199 tracts and only 55 CSAs
 
 ```
 
