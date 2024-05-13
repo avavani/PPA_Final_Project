@@ -294,7 +294,7 @@ ggplot() +
 
 
 # Defining Gentrification
-To create a Gentrification Index, we calculate the proportion of low and high income households for each census tract in 2022 and 2012. We subtract the change in low income proportion of households from the high income proportion.
+To create a Gentrification Index, we calculate the proportion of low and high income households for each census tract in 2022 and 2012. We subtract the change in low income proportion of households from the high income proportion over the ten years.
 
 ```{r callingincomedata}
 #Getting population by Income numbers
