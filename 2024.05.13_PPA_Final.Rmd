@@ -565,6 +565,26 @@ crime <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/serv
 
 ```
 
+```{r feature_mapcol1, message=FALSE, warning=FALSE}
+
+#2022 Median Rent
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_rent22, aes(fill = estimate), col = "transparent") +
+  scale_fill_gradient(
+    high = "#344713",
+    low = "#C9E5A8",
+    labels = scales::dollar) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Median Gross Rent",
+       title = "2022 Median Gross Rent",
+       subtitle = "Baltimore City, MD")
+
+```
 
 ## Joining additional metrics
 
@@ -625,12 +645,6 @@ acs.hoods <- acs.hoods %>%
   left_join(bmore_bids)%>%
   mutate(across(where(is.numeric), ~replace_na(., 0)),
          across(where(is.character), ~replace_na(., "Unknown")))
-```
-
-```{r feature_mapcol1, message=FALSE, warning=FALSE}
-
-
-
 ```
 
 
