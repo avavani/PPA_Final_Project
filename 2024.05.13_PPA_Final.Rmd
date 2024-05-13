@@ -399,7 +399,7 @@ tm_shape(all.acs.sf)+
 ```
 
 # Data Collection
-
+Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
 
 ```{r bmore_data, message=FALSE, warning=FALSE}
 
@@ -481,7 +481,7 @@ all_variables <- st_join(all_variables, tracts, join = st_intersects,
 # Defining Gentrification
 To create a Gentrification Index, we calculate the proportion of low and high income households for each census tract in 2022 and 2012. We subtract the change in low income proportion of households from the high income proportion over the ten years.
 
-```{r callingincomedata}
+```{r callingincomedata2}
 #Getting population by Income numbers
 bmore_ctmedhhinc12 <- get_acs(
   geography = "tract", 
@@ -538,7 +538,7 @@ bmore_ctmedhhinc22 <- get_acs(
   mutate(percentHighInc22 = H/tot, percentLowInc22 = L/tot)
 ```
 
-```{r makingindex}
+```{r makingindex2}
 #joining all
 bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
   select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
@@ -554,7 +554,7 @@ all.acs <- all.acs%>%
          TRUE ~ 0))
 ```
 
-```{r joiningviz1}
+```{r joiningviz12}
 baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
 all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 
@@ -564,7 +564,7 @@ tm_shape(all.acs.sf)+
 
 # Data Collection
 
-```{r bmore_data, message=FALSE, warning=FALSE}
+```{r bmore_data2, message=FALSE, warning=FALSE}
 
 #Open-Bid List - Vacants to Value 
 bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")
@@ -591,7 +591,7 @@ walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest
 
 ```
 
-```{r bmore_clean_data, message=FALSE, warning=FALSE}
+```{r bmore_clean_data2, message=FALSE, warning=FALSE}
 #percentage of vacant lots 
 bmore_p_lots <- bmore_p_lots %>%
   select(CSA2020, vacant21, geometry) %>%
