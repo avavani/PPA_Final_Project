@@ -414,7 +414,7 @@ bmore_ctmedhhinc22 <- get_acs(
   mutate(percentHighInc22 = H/tot, percentLowInc22 = L/tot)
 ```
 
-```{r makingindex}
+```{r makingindex, eval=FALSE, include=FALSE}
 #joining all
 bmore_hhinc_change <- left_join(bmore_ctmedhhinc12, bmore_ctmedhhinc22, by = "GEOID") %>%
   select(GEOID, percentHighInc12, percentHighInc22, percentLowInc12, percentLowInc22)
