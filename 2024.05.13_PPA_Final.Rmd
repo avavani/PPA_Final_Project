@@ -293,7 +293,7 @@ ggplot() +
 ```
 
 
-#Defining Gentrification
+# Defining Gentrification
 To create a Gentrification Index, we calculate the proportion of low and high income households for each census tract in 2022 and 2012. We subtract the change in low income proportion of households from the high income proportion.
 
 ```{r callingincomedata}
@@ -383,6 +383,8 @@ tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
 
+# Data Collection
+
 ```{r bmore_data, message=FALSE, warning=FALSE}
 
 #Open-Bid List - Vacants to Value 
@@ -438,10 +440,8 @@ walk_score <- walk_score %>%
 
 ```
 
-## Visualization
+# Model Development & Testing
 
-
-## Moving to Modelling
 ```{r modelling, warning=FALSE, message=FALSE}
 p_load(stargazer)
 
@@ -503,6 +503,8 @@ ggplot(testProbs, aes(x = probs, fill = as.factor(class))) +
         plot.subtitle = element_text(size = 12),
         plot.caption = element_text(size = 8))
 ```
+
+# Validation
 
 More of the stuff. This time calling up a ROC curve. 
 
@@ -585,4 +587,4 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
         plot.caption = element_text(size = 8))
 ```
 
-
+# Conclusion
