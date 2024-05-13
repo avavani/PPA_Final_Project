@@ -444,82 +444,6 @@ tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
 
-```{r bmore_data, message=FALSE, warning=FALSE}
-
-#Open-Bid List - Vacants to Value 
-bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")
-
-#Universities & colleges? 
-bmore_colleges <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Universities_and_Colleges/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-#Businesses by community statistical areas 
-bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiind/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
- 
-#Percentage of vacant lots 
-bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-#Baltimore schools
-
-school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-#walk score
-walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wlksc/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-```
-
-```{r bmore_clean_data, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
-#percentage of vacant lots 
-bmore_p_lots <- bmore_p_lots %>%
-  select(CSA2020, vacant21, geometry) %>%
-  rename(CSA = CSA2020, 
-         p_vacant = vacant21)
-
-#number of businesses 
-bmore_business <- bmore_business %>%
-  select(CSA2020, neiind21, geometry) %>%
-  rename(CSA = CSA2020, 
-         business_count = neiind21)
-
-#percentage of 3rd grade students who met math test target 
-school_outcome <- school_outcome %>%
-  select(CSA2010, pread317, geometry) %>%
-  rename(CSA = CSA2010,
-         p_students = pread317)
-
-#walk score
-walk_score <- walk_score %>%
-  select(CSA2010, wlksc17, geometry) %>%
-  rename(CSA = CSA2010,
-         walk_score = wlksc17)
-
-#all variables 
-variables1 <- bmore_p_lots %>%
-  st_drop_geometry() %>%
-  full_join(bmore_business) %>%
-  st_as_sf() %>%
-  st_transform(variables1,
-               crs = st_crs(baltimore_tracts))
-
-#CSA names are different for schools and walk score so I'm combining them separately 
-variables2 <- school_outcome %>%
-  st_drop_geometry() %>%
-  full_join(walk_score) %>%
-  st_as_sf() %>%
-  st_transform(variables2,
-               crs = st_crs(baltimore_tracts))
-
-all_variables <- st_join(variables1, variables2) #I think this is where things go left 
-
-tracts <- baltimore_tracts %>%
-  select(GEOID, geometry) 
-
-all_variables <- st_join(all_variables, tracts, join = st_intersects, 
-                         left=FALSE)
-
-#the geographies are all over the place, will have to clean - maybe areal interpolation? 
-#based on the joins, a lot of the CSAs encompass multiple tracts, which makes sense since there's 199 tracts and only 55 CSAs
-
-```
 
 misplaced above?
 
@@ -612,65 +536,10 @@ tm_shape(all.acs.sf)+
 # Data Collection
 For testing the ability to predict gentrification, input features that could be observed by eye were sourced, cleaned, and used in the model. Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
 
-```{r bmore_data2, message=FALSE, warning=FALSE}
+```{r bmore_data, message=FALSE, warning=FALSE}
 
 #Open-Bid List - Vacants to Value 
-bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")
-
-#Universities & colleges? 
-bmore_colleges <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Universities_and_Colleges/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-#Businesses by community statistical areas 
-bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiind/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
- 
-#Percentage of vacant lots 
-bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-
-#Note to self (Tina) - make new combined features file 
-
-
-#Baltimore schools
-
-school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-#walk score
-walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wlksc/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-```
-
-```{r bmore_clean_data2, message=FALSE, warning=FALSE}
-#percentage of vacant lots 
-bmore_p_lots <- bmore_p_lots %>%
-  select(CSA2020, vacant21, geometry) %>%
-  rename(CSA = CSA2020, 
-         p_vacant = vacant21)
-
-#number of businesses 
-bmore_business <- bmore_business %>%
-  select(CSA2020, neiind21, geometry) %>%
-  rename(CSA = CSA2020, 
-         business_count = neiind21)
-
-#percentage of 3rd grade students who met math test target 
-school_outcome <- school_outcome %>%
-  select(CSA2010, pread317, geometry) %>%
-  rename(CSA = CSA2010,
-         p_students = pread317)
-
-#walk score
-walk_score <- walk_score %>%
-  select(CSA2010, wlksc17, geometry) %>%
-  rename(CSA = CSA2010,
-         walk_score = wlksc17)
-
-
-```
-
-## Joining additional metrics
-
-```{r}
-tract_bids <- bmore_bids %>%
+bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")%>%
   st_transform(crs = st_crs(baltimore_tracts))%>%
   st_join(baltimore_tracts)%>%
   group_by(GEOID)%>%
@@ -678,6 +547,46 @@ tract_bids <- bmore_bids %>%
   st_drop_geometry()%>%
   rename(tractbids = n)
 
+#Universities & colleges? 
+bmore_colleges <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Universities_and_Colleges/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")%>%
+  st_transform(crs = st_crs(baltimore_tracts))
+
+#Businesses by community statistical areas 
+bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiind/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")%>%
+  mutate(changebiz = neiind19 - neiind10)%>%
+  select(CSA2010, neiind21, geometry, changebiz) %>%
+  rename(CSA = CSA2010, 
+         business_count = neiind21)
+ 
+#Percentage of vacant lots 
+bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson") %>%
+  select(CSA2020, vacant21, geometry) %>%
+  rename(CSA = CSA2020, 
+         p_vacant = vacant21)
+
+#Baltimore schools
+
+school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")%>%
+  select(CSA2010, pread317, geometry) %>%
+  rename(CSA = CSA2010,
+         p_students = pread317)%>%
+  st_centroid()
+
+#walk score
+walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wlksc/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")%>%
+  mutate(changewalk = wlksc17 - wlksc11)%>%
+  select(CSA2010, wlksc17, geometry, changewalk) %>%
+  rename(CSA = CSA2010,
+         walk_score = wlksc17)%>%
+  st_centroid()
+
+```
+
+
+## Joining additional metrics
+
+```{r}
+p_load(nngeo,FNN,tibble)
 bmore_hoods <- bmore_p_lots %>%
   select(-p_vacant)
 
@@ -686,15 +595,21 @@ bmore_CSA_data <- bmore_p_lots %>%
   left_join(bmore_business)%>%
   st_as_sf()
 
-bmore_school <- school_outcome %>%
-  st_centroid()
+bmore_CSA_data <- st_join(bmore_CSA_data, school_outcome, left = TRUE)
 
-bmore_CSA_data <- st_join(bmore_CSA_data, bmore_school, left = TRUE)
+bmore_CSA_data <- st_join(bmore_CSA_data, walk_score, left = TRUE)
 
-bmore_walk <- walk_score %>%
-  st_centroid()
-
-bmore_CSA_data <- st_join(bmore_CSA_data, bmore_walk, left = TRUE)
+coldist <- baltimore_tracts
+coldist$nearest_college_index <- st_nearest_feature(coldist, bmore_colleges)
+coldist <- coldist %>%
+  rowwise() %>%
+  mutate(nearest_college = list(bmore_colleges[nearest_college_index, ]))
+coldist <- coldist %>%
+  mutate(coldist = st_distance(geometry, nearest_college$geometry))%>%
+  select(-nearest_college_index,
+         -nearest_college)%>%
+  rename(collegedist = coldist)%>%
+  st_drop_geometry()
 
 acs.hoods <- all.acs.sf %>%
   st_transform(crs = st_crs(bmore_hoods))%>%
@@ -705,6 +620,8 @@ acs.hoods <- all.acs.sf %>%
   mutate(NAME = coalesce(NAME.x, NAME.y)) %>%
   select(-NAME.x, -NAME.y)
 
+acs.hoods <- acs.hoods %>%
+  left_join(coldist)
 
 acs.hoods <- acs.hoods %>%
   select(-STATEFP,
