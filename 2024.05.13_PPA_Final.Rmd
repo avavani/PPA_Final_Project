@@ -256,10 +256,6 @@ tm_shape(all.acs.sf)+
 
 
 ```{r bmore_data, message=FALSE, warning=FALSE}
-#Vacant lots 
-bmore_lots <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/1/query?outFields=*&where=1%3D1&f=geojson")
-
-bmore_lots$DateNotice <- as.POSIXct(bmore_lots$DateNotice, format = "%Y-%m-%d %H:%M:%S")
 
 #Open-Bid List - Vacants to Value 
 bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")
@@ -280,6 +276,37 @@ bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/re
 #Baltimore schools
 
 school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+
+#walk score
+walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wlksc/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+
+```
+
+```{r bmore_clean_data, message=FALSE, warning=FALSE}
+#percentage of vacant lots 
+bmore_p_lots <- bmore_p_lots %>%
+  select(CSA2020, vacant21, geometry) %>%
+  rename(CSA = CSA2020, 
+         p_vacant = vacant21)
+
+#number of businesses 
+bmore_business <- bmore_business %>%
+  select(CSA2020, neiind21, geometry) %>%
+  rename(CSA = CSA2020, 
+         business_count = neiind21)
+
+#percentage of 3rd grade students who met math test target 
+school_outcome <- school_outcome %>%
+  select(CSA2010, pread317, geometry) %>%
+  rename(CSA = CSA2010,
+         p_students = pread317)
+
+#walk score
+walk_score <- walk_score %>%
+  select(CSA2010, wlksc17, geometry) %>%
+  rename(CSA = CSA2010,
+         walk_score = wlksc17)
+
 
 ```
 
