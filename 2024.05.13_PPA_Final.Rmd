@@ -20,7 +20,7 @@ Defining and predicting gentrification is becoming more and more relevant to the
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(pacman)
-p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
+p_load(dplyr, ggplot2, , patchwork, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
 ```
 
 ```{r geography, include=FALSE, message=FALSE, warning=FALSE}
@@ -234,8 +234,11 @@ bmore_hv22 <- get_acs(
 
 
 ```
+:::: {style="display: flex;"}
 
-```{r bmorevis_map, message=FALSE, warning=FALSE}
+::: {}
+
+```{r bmorevis_mapcol1, message=FALSE, warning=FALSE}
  
 #2022 Median Household Income
 ggplot() +
@@ -270,7 +273,13 @@ ggplot() +
   labs(fill = "Percent Non-White",
        title = "2022 Race/Ethnicity",
        subtitle = "Baltimore City, MD")
+```
 
+:::
+
+::: {}
+
+```{r bmorevis_mapcol2, message=FALSE, warning=FALSE}
 #2022 Majority Owner
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
@@ -307,7 +316,12 @@ ggplot() +
 
 #2022 Median Rent
 
+
 ```
+
+:::
+
+::::
 
 Baltimore is less than an hour North of Annapolis, MD (the state capital) and Washington, DC as the crow drives. Baltimore/Washington International Airport (BWI) does not lie within Baltimore City boundaries.
 
