@@ -15,7 +15,7 @@ output:
 ---
 
 # Abstract
-Defining and predicting gentrification is becoming more and more relevant as longtime residents in typically urban areas across the United States become more and more aware of how previously disinvested communities can become prime locations for an influx of new residents who often do not resemble the existing socio-economic characteristics of their neighborhoods. 
+Defining and predicting gentrification is becoming more and more relevant  as longtime residents in typically urban areas across the United States become more and more aware of how previously disinvested communities can become prime locations for an influx of new residents who often do not resemble the existing socio-economic characteristics of their neighborhoods. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
