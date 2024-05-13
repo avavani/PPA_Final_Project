@@ -256,7 +256,68 @@ bmore_rent22 <- get_acs(
 ::: {}
 
 ```{r bmorevis_mapcol1, message=FALSE, warning=FALSE}
- 
+
+#2022 Median Household Income
+bmore_hhinc22 <- get_acs(
+  geography = "tract", 
+  variables = "B19013_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE 
+) %>%
+  select(GEOID, estimate)
+
+#2022 Majority Non-White
+bmore_nonwhite22 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B03002_001", white = "B03002_003"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE
+) %>%
+  select(GEOID, variable, estimate) %>%
+  pivot_wider(names_from = variable, values_from = estimate) %>%
+  mutate(nonwhite = 1 - (white/tot))
+
+#2022 Majority Owner
+bmore_pcentoo22 <- get_acs(
+  geography = "tract", 
+  variables = c(tot = "B25003_001", oo = "B25003_002", ro = "B25003_003"),
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE
+) %>%
+  select(GEOID, variable, estimate) %>%
+  pivot_wider(names_from = variable, values_from = estimate) %>%
+  mutate(propoo = (oo/tot))
+
+#2022 Median Home Value
+bmore_hv22 <- get_acs(
+  geography = "tract", 
+  variables = "B25077_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE 
+) %>%
+  select(GEOID, estimate)
+
+#2022 Median Rent
+bmore_rent22 <- get_acs(
+  geography = "tract", 
+  variables = "B25031_001",
+  state = "MD", 
+  county = "Baltimore City",
+  year = 2022,
+  geometry = TRUE 
+) %>%
+  select(GEOID, estimate)
+
+
+
 #2022 Median Household Income
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
