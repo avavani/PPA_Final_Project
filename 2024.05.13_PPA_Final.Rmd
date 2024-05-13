@@ -426,12 +426,7 @@ all.acs <- left_join(all.acs, bmore_hhinc_change)%>%
 
 #getting my index
 all.acs <- all.acs %>%
-  mutate(
-    NHHIncChangeper = HHIncChangeper / max(abs(HHIncChangeper), na.rm = TRUE),
-    NChangeInHighIncPct = ChangeInHighIncPct / max(abs(ChangeInHighIncPct), na.rm = TRUE),
-    NChangeInLowIncPct = ChangeInLowIncPct / max(abs(ChangeInLowIncPct), na.rm = TRUE)
-  )%>%
-  mutate(genindex = NChangeInHighIncPct - (NChangeInLowIncPct))%>%
+  mutate(genindex = ChangeInLowIncPct)%>%
   mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.75, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
@@ -639,7 +634,7 @@ acs.hoods <- acs.hoods %>%
   select(-CSA.x, -CSA.y)%>%
   st_drop_geometry()%>%
   select(-geometry)%>%
-  left_join(tract_bids)%>%
+  left_join(bmore_bids)%>%
   mutate(across(where(is.numeric), ~replace_na(., 0)),
          across(where(is.character), ~replace_na(., "Unknown")))
 ```
