@@ -35,7 +35,7 @@ water_bound <- st_as_sfc(st_bbox(md_bound), crs = "EPSG:4269")
 
 ```
 
-```{r callingacsdata, include=FALSE, message=FALSE, warning=FALSE}
+```{r callingacsdata, include=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
 #Getting my ACS Variable LIst
 acs_variable_list.2012 <- load_variables(2012, 
                                          "acs5", 
@@ -89,7 +89,9 @@ bmore_acs17 <- get_acs(
       NonFamilyHouseholds17 = B11016_009E,
       MedianRent17 = B25064_001E,
       MedianHomeValue17 = B25077_001E)%>%
-  mutate(inflation.adjHH17 = MedianHouseholdIncome17 * 1.16)%>%
+  mutate(inflation.adjHH17 = MedianHouseholdIncome17 * 1.16,
+         MedianRent17 = MedianRent17 * 1.16,
+         MedianHomeValue17 = MedianHomeValue17 *1.16)%>%
   select(GEOID,NAME,ends_with("17"))
 
 
@@ -426,8 +428,10 @@ all.acs <- left_join(all.acs, bmore_hhinc_change)%>%
 
 #getting my index
 all.acs <- all.acs %>%
-  mutate(genindex = ChangeInLowIncPct)%>%
-  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.75, na.rm = TRUE)))~ 1,
+  mutate(genindex = ((ChangeInLowIncPct + RentPctChange + HomeValuePctChange)/3))
+
+all.acs <- all.acs %>%
+mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.80, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
 
@@ -447,7 +451,7 @@ We define our Gentrification Index per CT as [ (âˆ† High Income Proportion) - (â
 
 This index was then normalized to reflect entirely positive numbers between 0 and 1. But did we take the 30th percentile of all the results or of the ones that count as gentrified? I think we should take a percentile of the ones that appear to be above 0 before the normalization. Flag to discuss.
 
-```{r callingincomedata2}
+```{r callingincomedata2, cache=TRUE}
 #Getting population by Income numbers
 bmore_ctmedhhinc12 <- get_acs(
   geography = "tract", 
