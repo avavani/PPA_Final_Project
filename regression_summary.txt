@@ -5,6 +5,7 @@ Regression Results
                              -----------------------------
                                        gentrify           
 ----------------------------------------------------------
+<<<<<<< Updated upstream
 TotalPopulation17               -0.001 (-0.002, 0.001)    
 TotalHousingUnits17              0.001 (-0.003, 0.005)    
 VacantHousingUnits17            -0.0003 (-0.007, 0.007)   
@@ -45,6 +46,52 @@ Constant                        -2.313 (-6.426, 1.801)
 Observations                              176             
 Log Likelihood                          -49.326           
 Akaike Inf. Crit.                       168.651           
+=======
+TotalPopulation17               -0.001 (-0.004, 0.001)    
+TotalHousingUnits17              0.009* (0.002, 0.016)    
+VacantHousingUnits17           -0.011* (-0.021, -0.001)   
+MedianHouseholdIncome17       0.00004 (-0.00003, 0.0001)  
+WhiteAlone17                    -0.0001 (-0.001, 0.001)   
+GradProfessionalDegree17        -0.005 (-0.009, 0.0001)   
+BachelorsDegree17               -0.001 (-0.008, 0.005)    
+OwnerOccupiedHouseholdSize17   -2.309* (-4.171, -0.447)   
+RenterOccupiedSize17             1.675 (-0.386, 3.736)    
+FamilyHouseholds17              -0.005 (-0.015, 0.005)    
+NonFamilyHouseholds17                                     
+MedianRent17                    -0.0003 (-0.004, 0.003)   
+MedianHomeValue17             0.00001 (-0.00001, 0.00002) 
+inflation.adjHH17                                         
+PopChangePct                    -0.025 (-0.102, 0.051)    
+HUnitsPctChange                  0.023 (-0.092, 0.137)    
+VacantUnitsPctChange            -0.002 (-0.021, 0.018)    
+RentPctChange                    0.009 (-0.029, 0.048)    
+HomeValuePctChange              -0.0002 (-0.002, 0.001)   
+IncPctChange                    0.076*** (0.037, 0.115)   
+WhiteAlonePctChange             0.0001 (-0.004, 0.004)    
+GradPctChange                    0.005 (-0.001, 0.010)    
+CountyWWMovePctChange           -0.003 (-0.015, 0.009)    
+SStateMovePctChange             -0.0004 (-0.002, 0.001)   
+DiffStateMovePctChange          -0.001 (-0.003, 0.002)    
+AbroadMovePctChange             -0.001 (-0.006, 0.004)    
+BachelorsPctChange               0.007 (-0.006, 0.019)    
+OOSizePctChange                  0.006 (-0.044, 0.056)    
+ROSizePctChange                 0.072** (0.019, 0.125)    
+FamHHPctChange                   0.028 (-0.007, 0.063)    
+NonFamHHPctChange                0.005 (-0.040, 0.049)    
+p_vacant                        -0.004 (-0.121, 0.114)    
+business_count                 -0.004* (-0.007, -0.001)   
+changebiz                        0.003 (-0.003, 0.009)    
+p_students                       0.005 (-0.055, 0.066)    
+walk_score                      0.075*** (0.034, 0.117)   
+changewalk                       0.130 (-0.074, 0.333)    
+collegedist                     -0.001 (-0.002, 0.0001)   
+tractbids                        0.058* (0.003, 0.114)    
+Constant                       -8.798* (-17.377, -0.218)  
+----------------------------------------------------------
+Observations                              176             
+Log Likelihood                          -48.199           
+Akaike Inf. Crit.                       172.398           
+>>>>>>> Stashed changes
 ==========================================================
 Significance levels:         *p<0.05; **p<0.01; ***p<0.001
                              *** p<0.001                  
