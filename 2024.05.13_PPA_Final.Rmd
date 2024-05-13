@@ -313,7 +313,21 @@ ggplot() +
        subtitle = "Baltimore City, MD")
 
 #2022 Median Rent
-
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_rent22, aes(fill = estimate), col = "transparent") +
+  scale_fill_gradient(
+    high = "#344713",
+    low = "#C9E5A8",
+    labels = scales::dollar) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Median Gross Rent",
+       title = "2022 Median Gross Rent",
+       subtitle = "Baltimore City, MD")
 
 #2022 Majority Owner
 ggplot() +
@@ -331,8 +345,6 @@ ggplot() +
   labs(fill = "Percent Owner-Occupied",
        title = "2022 Tenure",
        subtitle = "Baltimore City, MD")
-
-
 
 
 ```
@@ -432,9 +444,6 @@ tm_shape(all.acs.sf)+
   tm_polygons(fill = "gentrify")
 ```
 
-# Data Collection
-Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
-
 ```{r bmore_data, message=FALSE, warning=FALSE}
 
 #Open-Bid List - Vacants to Value 
@@ -512,8 +521,10 @@ all_variables <- st_join(all_variables, tracts, join = st_intersects,
 
 ```
 
+misplaced above?
+
 # Defining Gentrification
-To create a Gentrification Index, we calculate the proportion of low and high income households for each census tract in 2022 and 2012. We subtract the change in low income proportion of households from the high income proportion over the ten years.
+We define our Gentrification Index per CT as [ (∆ High Income Proportion) - (∆Low Income Proportion) ]. The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification. 
 
 ```{r callingincomedata2}
 #Getting population by Income numbers
@@ -597,6 +608,7 @@ tm_shape(all.acs.sf)+
 ```
 
 # Data Collection
+Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
 
 ```{r bmore_data2, message=FALSE, warning=FALSE}
 
