@@ -439,22 +439,23 @@ all.acs <- all.acs %>%
   mutate(genindex = ((ChangeInHighIncPct + HomeValuePctChange + RentPctChange)))
 
 all.acs <- all.acs %>%
-mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.80, na.rm = TRUE)))~ 1,
+mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.70, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
 
 ```{r joiningviz1, include=FALSE}
 baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
-all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
+all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")%>%
+  st_as_sf()
 
 tm_shape(all.acs.sf) +
-  tm_polygons(fill = "gentrify")
+  tm_polygons(col = "gentrify")
 ```
 
 # Data Collection
 For testing the ability to predict gentrification, input features that could be observed by eye were sourced, cleaned, and used in the model. Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
 
-```{r bmore_data, message=FALSE, warning=FALSE}
+```{r bmore_data, message=FALSE, warning=FALSE, cache=TRUE}
 
 #Open-Bid List - Vacants to Value 
 bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")%>%
@@ -496,6 +497,10 @@ walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest
   rename(CSA = CSA2010,
          walk_score = wlksc17)%>%
   st_centroid()
+
+#crime
+crime <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Part1_Crime_Beta/FeatureServer/0/query?where=1%3D1&outFields=CrimeCode,Description,Weapon,Post,Location,Latitude,Longitude,GeoLocation,Total_Incidents,CCNumber,CrimeDateTime&outSR=4326&f=json")
+  
 
 ```
 
@@ -580,7 +585,17 @@ all.acs.reg <- acs.hoods %>%
          -MedianHomeValue22,
          -MedianHouseholdIncome22,
          -percentHighInc22,
-         -percentHighInc12)
+         -percentHighInc12,
+         -WhiteAlone17,
+         -GradProfessionalDegree17,
+         -MovedAbroad17,
+         -OwnerOccupiedHouseholdSize17,
+         -RenterOccupiedSize17,
+         -MedianHomeValue17,
+         -inflation.adjHH17,
+         -FamilyHouseholds17,
+         -NonFamilyHouseholds17,
+         -VacantHousingUnits17)
 
 train <- all.acs.reg %>%
   sample_frac(.75)
