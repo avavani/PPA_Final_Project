@@ -180,7 +180,9 @@ all.acs <- bmore_acs17 %>%
     NonFamHHPctChange = if_else(NonFamilyHouseholds17 != 0, ((NonFamilyHouseholds22 - NonFamilyHouseholds17) / NonFamilyHouseholds17) * 100, 0)
   ) %>%
   mutate(NAME = coalesce(NAME.x, NAME.y)) %>%
-  select(-NAME.x, -NAME.y)
+  select(-NAME.x, -NAME.y)%>%
+    mutate(across(where(is.numeric), ~replace_na(., 0)),
+         across(where(is.character), ~replace_na(., "Unknown")))
 ```
 
 # About Baltimore City
@@ -420,7 +422,7 @@ all.acs <- left_join(all.acs, bmore_hhinc_change)%>%
 
 #getting my index
 all.acs <- all.acs %>%
-  mutate(genindex = ((ChangeInLowIncPct + RentPctChange + HomeValuePctChange)/3))
+  mutate(genindex = ((ChangeInHighIncPct + HomeValuePctChange + RentPctChange)))
 
 all.acs <- all.acs %>%
 mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.80, na.rm = TRUE)))~ 1,
@@ -431,7 +433,7 @@ mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.80, na.rm 
 baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
 all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")
 
-tm_shape(all.acs.sf)+
+tm_shape(all.acs.sf) +
   tm_polygons(fill = "gentrify")
 ```
 
@@ -563,14 +565,16 @@ all.acs.reg <- acs.hoods %>%
          -(ends_with("12")),
          -genindex,
          -CSA,
-         -MovedWithinCounty17,
-         -MovedFromSameState17,
-         -MovedFromDifferentState17,
-         -MovedAbroad17,
          -RentPctChange,
          -HomeValuePctChange,
          -MedianRent17,
-         -MedianHouseholdIncome17)
+         -MedianHouseholdIncome17,
+         -MedianRent22,
+         -MedianHouseholdIncome22,
+         -MedianHomeValue22,
+         -MedianHouseholdIncome22,
+         -percentHighInc22,
+         -percentHighInc12)
 
 train <- all.acs.reg %>%
   sample_frac(.75)
