@@ -1,37 +1,52 @@
 
 Regression Results
-================================================================
-                                     Dependent variable:        
-                             -----------------------------------
-                                          gentrify              
-----------------------------------------------------------------
-TotalPopulation12                -0.000 (-248.308, 248.308)     
-TotalHousingUnits12               0.000 (-446.091, 446.091)     
-VacantHousingUnits12             -0.000 (-602.523, 602.523)     
-MedianHouseholdIncome12             0.000 (-8.866, 8.866)       
-WhiteAlone12                      0.000 (-106.657, 106.657)     
-GradProfessionalDegree12         -0.000 (-515.891, 515.891)     
-MovedWithinCounty12              -0.000 (-357.285, 357.285)     
-MovedFromSameState12              0.000 (-786.764, 786.764)     
-MovedFromDifferentState12         0.000 (-878.345, 878.345)     
-MovedAbroad12                   0.000 (-1,485.487, 1,485.487)   
-BachelorsDegree12                -0.000 (-659.318, 659.318)     
-OwnerOccupiedHouseholdSize12  0.000 (-166,946.200, 166,946.200) 
-RenterOccupiedSize12          0.000 (-138,441.300, 138,441.300) 
-FamilyHouseholds12               -0.000 (-779.099, 779.099)     
-NonFamilyHouseholds12                                           
-MedianRent12                     -0.000 (-380.001, 380.001)     
-MedianHomeValue12                  -0.000 (-1.425, 1.425)       
-inflation.adjHH12                                               
-percentHighInc12              0.000 (-761,068.000, 761,068.000) 
-percentLowInc12                                                 
-Constant                     -26.566 (-729,634.400, 729,581.300)
-----------------------------------------------------------------
-Observations                                 147                
-Log Likelihood                             -0.000               
-Akaike Inf. Crit.                          36.000               
-================================================================
-Significance levels:         *p<0.05; **p<0.01; ***p<0.001      
-                             *** p<0.001                        
-                             ** p<0.01                          
-                             * p<0.05                           
+==========================================================
+                                  Dependent variable:     
+                             -----------------------------
+                                       gentrify           
+----------------------------------------------------------
+TotalPopulation17               -0.0005 (-0.002, 0.001)   
+TotalHousingUnits17             0.006* (0.0002, 0.012)    
+VacantHousingUnits17           -0.012** (-0.021, -0.003)  
+MedianHouseholdIncome17       0.00005 (-0.00003, 0.0001)  
+WhiteAlone17                    -0.001 (-0.002, 0.0003)   
+GradProfessionalDegree17        -0.001 (-0.006, 0.005)    
+MovedWithinCounty17              0.005 (-0.001, 0.010)    
+MovedFromSameState17            -0.003 (-0.011, 0.006)    
+MovedFromDifferentState17       0.017** (0.004, 0.029)    
+MovedAbroad17                  -0.033* (-0.057, -0.008)   
+BachelorsDegree17              -0.008* (-0.015, -0.0004)  
+OwnerOccupiedHouseholdSize17     0.260 (-1.462, 1.982)    
+RenterOccupiedSize17             0.369 (-1.252, 1.989)    
+FamilyHouseholds17              -0.004 (-0.012, 0.004)    
+NonFamilyHouseholds17                                     
+MedianRent17                     0.002 (-0.002, 0.005)    
+MedianHomeValue17            -0.00000 (-0.00002, 0.00002) 
+inflation.adjHH17                                         
+PopChangePct                    -0.057 (-0.149, 0.035)    
+HUnitsPctChange                 -0.001 (-0.117, 0.115)    
+VacantUnitsPctChange             0.003 (-0.015, 0.021)    
+RentPctChange                   -0.004 (-0.042, 0.033)    
+HomeValuePctChange             -0.00004 (-0.001, 0.001)   
+IncPctChange                    0.051** (0.020, 0.081)    
+WhiteAlonePctChange             0.0002 (-0.002, 0.002)    
+GradPctChange                    0.001 (-0.004, 0.005)    
+CountyWWMovePctChange            0.009 (-0.005, 0.022)    
+SStateMovePctChange            -0.00001 (-0.001, 0.001)   
+DiffStateMovePctChange          -0.002 (-0.008, 0.003)    
+AbroadMovePctChange             -0.002 (-0.006, 0.001)    
+BachelorsPctChange              -0.0004 (-0.011, 0.010)   
+OOSizePctChange                  0.046* (0.001, 0.092)    
+ROSizePctChange                  0.041 (-0.007, 0.089)    
+FamHHPctChange                   0.054 (-0.006, 0.115)    
+NonFamHHPctChange                0.029 (-0.022, 0.081)    
+Constant                        -7.679 (-15.565, 0.207)   
+----------------------------------------------------------
+Observations                              137             
+Log Likelihood                          -51.253           
+Akaike Inf. Crit.                       170.506           
+==========================================================
+Significance levels:         *p<0.05; **p<0.01; ***p<0.001
+                             *** p<0.001                  
+                             ** p<0.01                    
+                             * p<0.05                     

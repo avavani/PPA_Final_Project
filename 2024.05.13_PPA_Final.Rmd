@@ -61,32 +61,33 @@ acs_vars <- c("B01001_001E",# ACS total Pop estimate
           "B25077_001E") #MEDIAN HOME VALUE
 
 #Extracting the data for 2012
-bmore_acs12 <- get_acs(
+bmore_acs17 <- get_acs(
   geography = "tract", 
   variables = acs_vars,
   state = "MD", 
   county = "Baltimore City",
-  year = 2012,
+  year = 2017,
   output = "wide")%>%
-  rename(TotalPopulation12 = B01001_001E,
-      TotalHousingUnits12 = B25002_001E,
-      VacantHousingUnits12 = B25002_003E,
-      MedianHouseholdIncome12 = B19013_001E,
-      WhiteAlone12 = B02001_002E,
-      GradProfessionalDegree12 = B06009_006E,
-      MovedWithinCounty12 = B07001_033E,
-      MovedFromSameState12 = B07001_049E,
-      MovedFromDifferentState12 = B07001_065E,
-      MovedAbroad12 = B07001_081E,
-      BachelorsDegree12 = B06009_005E,
-      OwnerOccupiedHouseholdSize12 = B25010_002E,
-      RenterOccupiedSize12 = B25010_003E,
-      FamilyHouseholds12 = B11016_002E,
-      NonFamilyHouseholds12 = B11016_009E,
-      MedianRent12 = B25064_001E,
-      MedianHomeValue12 = B25077_001E)%>%
-  mutate(inflation.adjHH12 = MedianHouseholdIncome12 * 1.24)%>%
-  select(GEOID,NAME,ends_with("12"))
+  rename(TotalPopulation17 = B01001_001E,
+      TotalHousingUnits17 = B25002_001E,
+      VacantHousingUnits17 = B25002_003E,
+      MedianHouseholdIncome17 = B19013_001E,
+      WhiteAlone17 = B02001_002E,
+      GradProfessionalDegree17 = B06009_006E,
+      MovedWithinCounty17 = B07001_033E,
+      MovedFromSameState17 = B07001_049E,
+      MovedFromDifferentState17 = B07001_065E,
+      MovedAbroad17 = B07001_081E,
+      BachelorsDegree17 = B06009_005E,
+      OwnerOccupiedHouseholdSize17 = B25010_002E,
+      RenterOccupiedSize17 = B25010_003E,
+      FamilyHouseholds17 = B11016_002E,
+      NonFamilyHouseholds17 = B11016_009E,
+      MedianRent17 = B25064_001E,
+      MedianHomeValue17 = B25077_001E)%>%
+  mutate(inflation.adjHH17 = MedianHouseholdIncome17 * 1.16)%>%
+  select(GEOID,NAME,ends_with("17"))
+
 
 #extracting my data for 2022
 bmore_acs22 <- get_acs(
@@ -116,28 +117,28 @@ bmore_acs22 <- get_acs(
   select(GEOID,NAME,ends_with("22"))
 
 #one census tract has been combined in 2022. So I am adjusting this info in 2012 and joining back
-changed_22 <- bmore_acs12 %>%
+changed_22 <- bmore_acs17 %>%
   filter(NAME %in% c("Census Tract 1801, Baltimore city, Maryland", 
                      "Census Tract 1802, Baltimore city, Maryland"))%>%
   dplyr::summarize(
-    TotalPopulation12 = sum(TotalPopulation12),
-    TotalHousingUnits12 = sum(TotalHousingUnits12),
-    VacantHousingUnits12 = sum(VacantHousingUnits12),
-    MedianHouseholdIncome12 = mean(MedianHouseholdIncome12),
-    WhiteAlone12 = sum(WhiteAlone12),
-    GradProfessionalDegree12 = sum(GradProfessionalDegree12),
-    MovedWithinCounty12 = sum(MovedWithinCounty12),
-    MovedFromSameState12 = sum(MovedFromSameState12),
-    MovedFromDifferentState12 = sum(MovedFromDifferentState12),
-    MovedAbroad12 = sum(MovedAbroad12),
-    BachelorsDegree12 = sum(BachelorsDegree12),
-    OwnerOccupiedHouseholdSize12 = mean(OwnerOccupiedHouseholdSize12),
-    RenterOccupiedSize12 = mean(RenterOccupiedSize12),
-    FamilyHouseholds12 = sum(FamilyHouseholds12),
-    NonFamilyHouseholds12 = sum(NonFamilyHouseholds12),
-    inflation.adjHH12 = mean(inflation.adjHH12),
-    MedianRent12 = mean(MedianRent12),
-    MedianHomeValue12 = mean(MedianRent12)
+    TotalPopulation17 = sum(TotalPopulation17),
+    TotalHousingUnits17 = sum(TotalHousingUnits17),
+    VacantHousingUnits17 = sum(VacantHousingUnits17),
+    MedianHouseholdIncome17 = mean(MedianHouseholdIncome17),
+    WhiteAlone17 = sum(WhiteAlone17),
+    GradProfessionalDegree17 = sum(GradProfessionalDegree17),
+    MovedWithinCounty17 = sum(MovedWithinCounty17),
+    MovedFromSameState17 = sum(MovedFromSameState17),
+    MovedFromDifferentState17 = sum(MovedFromDifferentState17),
+    MovedAbroad17 = sum(MovedAbroad17),
+    BachelorsDegree17 = sum(BachelorsDegree17),
+    OwnerOccupiedHouseholdSize17 = mean(OwnerOccupiedHouseholdSize17),
+    RenterOccupiedSize17 = mean(RenterOccupiedSize17),
+    FamilyHouseholds17 = sum(FamilyHouseholds17),
+    NonFamilyHouseholds17 = sum(NonFamilyHouseholds17),
+    inflation.adjHH17 = mean(inflation.adjHH17),
+    MedianRent17 = mean(MedianRent17),
+    MedianHomeValue17 = mean(MedianRent17)
   ) %>%
   dplyr::mutate(
     NAME = "Census Tract 2806, Baltimore city, Maryland",
@@ -145,19 +146,35 @@ changed_22 <- bmore_acs12 %>%
   )
 
 #joining back adjusted info
-bmore_acs12 <- bmore_acs12 %>%
+bmore_acs17 <- bmore_acs17 %>%
   filter(!(NAME %in% c("Census Tract 1801, Baltimore city, Maryland", 
                        "Census Tract 1802, Baltimore city, Maryland"))) %>%
   bind_rows(changed_22)
 
 #creating large dataset
-all.acs <- bmore_acs12 %>%
-  left_join(bmore_acs22, by = c("GEOID"))%>%
+all.acs <- bmore_acs17 %>%
+  left_join(bmore_acs22, by = "GEOID") %>%
   mutate(
-    HHIncChangeper = ((MedianHouseholdIncome22 - MedianHouseholdIncome12) / MedianHouseholdIncome12) * 100
-  )%>%
-  mutate(NAME = coalesce(NAME.x, NAME.y)) %>% 
-  select(-NAME.x, -NAME.y) 
+    PopChangePct = if_else(TotalPopulation17 != 0, ((TotalPopulation22 - TotalPopulation17) / TotalPopulation17) * 100, 0),
+    HUnitsPctChange = if_else(TotalHousingUnits17 != 0, ((TotalHousingUnits22 - TotalHousingUnits17) / TotalHousingUnits17) * 100, 0),
+    VacantUnitsPctChange = if_else(VacantHousingUnits17 != 0, ((VacantHousingUnits22 - VacantHousingUnits17) / VacantHousingUnits17) * 100, 0),
+    RentPctChange = if_else(MedianRent17 != 0, ((MedianRent22 - MedianRent17) / MedianRent17) * 100, 0),
+    HomeValuePctChange = if_else(MedianHomeValue17 != 0, ((MedianHomeValue22 - MedianHomeValue17) / MedianHomeValue17) * 100, 0),
+    IncPctChange = if_else(MedianHouseholdIncome17 != 0, ((MedianHouseholdIncome22 - MedianHouseholdIncome17) / MedianHouseholdIncome17) * 100, 0),
+    WhiteAlonePctChange = if_else(WhiteAlone17 != 0, ((WhiteAlone22 - WhiteAlone17) / WhiteAlone17) * 100, 0),
+    GradPctChange = if_else(GradProfessionalDegree17 != 0, ((GradProfessionalDegree22 - GradProfessionalDegree17) / GradProfessionalDegree17) * 100, 0),
+    CountyWWMovePctChange = if_else(MovedWithinCounty17 != 0, ((MovedWithinCounty22 - MovedWithinCounty17) / MovedWithinCounty17) * 100, 0),
+    SStateMovePctChange = if_else(MovedFromSameState17 != 0, ((MovedFromSameState22 - MovedFromSameState17) / MovedFromSameState17) * 100, 0),
+    DiffStateMovePctChange = if_else(MovedFromDifferentState17 != 0, ((MovedFromDifferentState22 - MovedFromDifferentState17) / MovedFromDifferentState17) * 100, 0),
+    AbroadMovePctChange = if_else(MovedAbroad17 != 0, ((MovedAbroad22 - MovedAbroad17) / MovedAbroad17) * 100, 0),
+    BachelorsPctChange = if_else(BachelorsDegree17 != 0, ((BachelorsDegree22 - BachelorsDegree17) / BachelorsDegree17) * 100, 0),
+    OOSizePctChange = if_else(OwnerOccupiedHouseholdSize17 != 0, ((OwnerOccupiedHouseholdSize22 - OwnerOccupiedHouseholdSize17) / OwnerOccupiedHouseholdSize17) * 100, 0),
+    ROSizePctChange = if_else(RenterOccupiedSize17 != 0, ((RenterOccupiedSize22 - RenterOccupiedSize17) / RenterOccupiedSize17) * 100, 0),
+    FamHHPctChange = if_else(FamilyHouseholds17 != 0, ((FamilyHouseholds22 - FamilyHouseholds17) / FamilyHouseholds17) * 100, 0),
+    NonFamHHPctChange = if_else(NonFamilyHouseholds17 != 0, ((NonFamilyHouseholds22 - NonFamilyHouseholds17) / NonFamilyHouseholds17) * 100, 0)
+  ) %>%
+  mutate(NAME = coalesce(NAME.x, NAME.y)) %>%
+  select(-NAME.x, -NAME.y)
 ```
 
 # About Baltimore City
@@ -538,15 +555,9 @@ all.acs <- left_join(all.acs, bmore_hhinc_change)%>%
   mutate(ChangeInHighIncPct = (percentHighInc22 - percentHighInc12),
          ChangeInLowIncPct = (percentLowInc22 - percentLowInc12))
 
-#getting my index
-all.acs <- all.acs %>%
-  mutate(
-    NHHIncChangeper = HHIncChangeper / max(abs(HHIncChangeper), na.rm = TRUE),
-    NChangeInHighIncPct = ChangeInHighIncPct / max(abs(ChangeInHighIncPct), na.rm = TRUE),
-    NChangeInLowIncPct = ChangeInLowIncPct / max(abs(ChangeInLowIncPct), na.rm = TRUE)
-  )%>%
-  mutate(genindex = NChangeInHighIncPct - (NChangeInLowIncPct))%>%
-  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.75, na.rm = TRUE)))~ 1,
+all.acs <- all.acs%>%
+  mutate(genindex = ChangeInHighIncPct + abs(ChangeInLowIncPct))%>%
+  mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.70, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
 
@@ -620,19 +631,24 @@ walk_score <- walk_score %>%
 ```{r modelling, warning=FALSE, message=FALSE}
 p_load(stargazer)
 
-all.acs12 <- all.acs %>%
-  select(GEOID, gentrify, ends_with("12"))
+all.acs.reg <- all.acs %>%
+  select(-(ends_with("22")),
+         -(ends_with("12")),
+         -genindex,
+         -NAME)
 
-train <- all.acs12 %>%
+train <- all.acs.reg %>%
   sample_frac(.75)
 
 train_index <- as.numeric(rownames(train))
 
-test <- all.acs12[-train_index, ]
+test <- all.acs.reg[-train_index, ]
 
 reg.gentrify <- glm(gentrify ~ ., data = 
                     train %>%
-                      select(-GEOID),
+                      select(-GEOID,
+                             -ChangeInLowIncPct,
+                             -ChangeInHighIncPct),
                     family = "binomial"(link = "logit"))
 
 stargazer(reg.gentrify, type = "text", out = "regression_summary.txt", title = "Regression Results", 
