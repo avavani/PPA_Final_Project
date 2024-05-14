@@ -832,7 +832,7 @@ These patterns highlight that the model has greater confidence identifying non-g
 
 ## Model Performance
 
-Overall, our model performs well in terms of predicting gentrificiation. Though the model is limited by the lack of observations, the ROC curve still has an AUC value of 0.761, underscoring that the model performs well across all thresholds.
+Overall, our model performs well in terms of predicting gentrification. Though the model is limited by the lack of observations, the ROC curve still has an AUC value of 0.761, underscoring that the model performs well across all thresholds.
 
 ```{r ROCcurve, message=FALSE, warning=FALSE, include=FALSE}
 p_load(gridExtra, pROC)
