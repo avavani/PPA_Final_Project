@@ -947,4 +947,13 @@ tm_polygons(col = "Prediction")
 
 Measuring gentrification can be challenging, primarily due to the complexity of its definition. However, this model addresses this challenge by focusing on observable characteristics that the average resident can recognize. While advanced statistical models may have policy implications, the primary aim of this model is to empower city officials and residents to identify gentrification in their neighborhoods early on and take proactive steps to prevent displacement before it becomes a pressing issue.
 
-The results of the model indicate…
+The results of the model indicate factors such as increased housing units, larger owner-occupied household sizes, and income growth correlate with a greater risk of gentrification in Baltimore City, Maryland. These insights align with the literature on gentrification and most of these changes could be observed by the average resident. The model's accuracy rate of 78% further highlights its potential use as a tool to identify at-risk neighborhoods. 
+
+The model shows potential in identifying gentrification risk. Currently, it excels more in predicting indicators that an area is not undergoing gentrification, however, fine-tuning the model with adjusted thresholds could lead to a more cohesive and accurate prediction of areas at risk. 
+
+
+
+
+
+
+
