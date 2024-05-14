@@ -711,6 +711,8 @@ acs.hoods <- acs.hoods %>%
 # Model Development & Testing
 
 ```{r modelling, warning=FALSE, message=FALSE}
+set.seed(678)
+
 p_load(stargazer)
 
 all.acs.reg <- acs.hoods 
@@ -778,6 +780,10 @@ stargazer(reg.gentrify, type = "text", out = "regression_summary.txt", title = "
           notes.align = "l", notes.label = "Significance levels:")
 ```
 
+The regression results reveal important insights into the factors influencing gentrification risk within the studied area. Among the predictors, MovedFromSameState17, IncPctChange, HUnitsPctChange, and OOSizePctChange stand out as statistically significant contributors to the likelihood of gentrification. These findings suggest that areas with an increase in housing units, owner-occupied household size, and income are more prone to gentrification pressures, which aligns with literature that has been conducted on the indicators of gentrification. Surprisingly, other features in the model do not demonstrate a significant relationship with gentrification risk, highlighting the nuanced nature of this phenomenon and limitations to predictive modeling.
+
+The model's accuracy of 0.78 indicates that it correctly predicts gentrification status approximately 78% of the time, showcasing its potential utility in identifying at-risk neighborhoods. The sensitivity (true positive rate) and specificity (true negative rate) are reasonably balanced at 0.6154 and 0.8378, meaning the model is slightly better than chance at identifying true positives. 
+
 Testing the outcomes.
 
 ```{r confusionmatrix, warning=FALSE, message=FALSE, include=FALSE}
@@ -815,6 +821,11 @@ ggplot(testProbs, aes(x = probs, fill = as.factor(class))) +
         plot.subtitle = element_text(size = 12),
         plot.caption = element_text(size = 8))
 ```
+The higher peak to the left in the top chart indicates that the model is more confident in predicting non-gentrification instances (class 0) with lower probabilities (closer to 0). This suggests that there are clear features or patterns in the data that the model identifies as indicative of non-gentrification.
+
+The more evenly distributed curve in the bottom chart suggests that the model's predicted probabilities for gentrification instances (class 1) are spread out across a wider range. The slight peak between 0.5 and 0.75 indicates that there are instances where the model predicts a moderate to high likelihood of gentrification, but with some variability.
+
+Overall, these patterns highlight that the model has greater confidence identifying non-gentrification over gentrification. 
 
 # Validation
 
