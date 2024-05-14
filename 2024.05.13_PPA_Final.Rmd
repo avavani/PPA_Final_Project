@@ -514,7 +514,7 @@ _Businesses_
 The businesses feature contains the count of businesses in each community statistical area (CSA), which is a geographic measurement developed by the Baltimore City Planning Department to define neighborhood clusters. Ths model also includes a change in businesses feature, which accounts for the change in count of businesses per CSA from 2010 to 2019. 
 
 _Vacant Lots_ 
-The vacant lots feature includes the percentage of city owned vacant properties per CSA. 
+The vacant lots feature includes the percentage of residential properties which have been classifies as vacant or abandoned by the City of Baltimore per CSA. 
 
 _Baltimore Schools_ 
 The schools feature highlights the percentage of students per CSA who exceeded or met the Partnership for Assessment of Readiness for College and Careers (PARCC) math expectations. 
