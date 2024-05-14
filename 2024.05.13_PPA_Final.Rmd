@@ -582,7 +582,6 @@ _Walk Score_
 The walk score feature includes the average walk score by CSA. 
 
 I will include more stuff about the features we created from the datasets. - Tina 
-```{r bmore_data, message=FALSE, warning=FALSE, cache=TRUE}
 
 ```{r bmore_data, message=FALSE, warning=FALSE, cache=TRUE, include=FALSE}
 
