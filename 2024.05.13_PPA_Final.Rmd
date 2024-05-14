@@ -18,10 +18,11 @@ output:
 
 Defining and predicting gentrification is becoming more and more relevant to the average person as neighborhood residents become more concerned about getting priced out of their communities. Once something that could only be observed in hindsight, anticipating gentrification and attempting to prevent its disparate effects has become the subject of activism and counter-lobbying efforts. This report attempts to determine if gentrification can be correctly identified in Baltimore City, Maryland based on neighborhood characteristics that the average person can observe.
 
-```{r setup, include=FALSE, , warning=FALSE, message=FALSE, cache=TRUE}
+```{r setup, include=FALSE, , warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 library(pacman)
-p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap, tidyverse, dplyr)
+library(dplyr)
+p_load(ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap, tidyverse)
 ```
 
 ```{r geography, include=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
@@ -209,7 +210,11 @@ all.acs <- bmore_acs17 %>%
 
 Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 people (2020 Census). An incredibly historic city, though Baltimore was once full of rigorous industry, unbridled American patriotism, and wealth, its late 20th century reality was plagued by extreme disinvestment, high crime, and white flight.
 
-```{r bmorevis_data, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+::: {style="display: flex;"}
+
+::: {}
+
+```{r tragedy, message=FALSE, warning=FALSE, include=FALSE}
 
 #2022 Median Household Income
 bmore_hhinc22 <- get_acs(
@@ -269,75 +274,9 @@ bmore_rent22 <- get_acs(
   geometry = TRUE 
 ) %>%
   select(GEOID, estimate)
-
 ```
 
-::: {style="display: flex;"}
-<div>
-
-```{r bmorevis_mapcol1, message=FALSE, warning=FALSE, include=FALSE}
-
-#2022 Median Household Income
-bmore_hhinc22 <- get_acs(
-  geography = "tract", 
-  variables = "B19013_001",
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = TRUE 
-) %>%
-  select(GEOID, estimate)
-
-#2022 Majority Non-White
-bmore_nonwhite22 <- get_acs(
-  geography = "tract", 
-  variables = c(tot = "B03002_001", white = "B03002_003"),
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = TRUE
-) %>%
-  select(GEOID, variable, estimate) %>%
-  pivot_wider(names_from = variable, values_from = estimate) %>%
-  mutate(nonwhite = 1 - (white/tot))
-
-#2022 Majority Owner
-bmore_pcentoo22 <- get_acs(
-  geography = "tract", 
-  variables = c(tot = "B25003_001", oo = "B25003_002", ro = "B25003_003"),
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = TRUE
-) %>%
-  select(GEOID, variable, estimate) %>%
-  pivot_wider(names_from = variable, values_from = estimate) %>%
-  mutate(propoo = (oo/tot))
-
-#2022 Median Home Value
-bmore_hv22 <- get_acs(
-  geography = "tract", 
-  variables = "B25077_001",
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = TRUE 
-) %>%
-  select(GEOID, estimate)
-
-#2022 Median Rent
-bmore_rent22 <- get_acs(
-  geography = "tract", 
-  variables = "B25031_001",
-  state = "MD", 
-  county = "Baltimore City",
-  year = 2022,
-  geometry = TRUE 
-) %>%
-  select(GEOID, estimate)
-
-
-
+```{r bmorevis_mapcol1, echo=FALSE, message=FALSE, warning=FALSE}
 #2022 Median Household Income
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
@@ -376,11 +315,11 @@ ggplot() +
 
 ```
 
-</div>
+:::
 
-<div>
+::: {}
 
-```{r bmorevis_mapcol2, message=FALSE, warning=FALSE, include=FALSE}
+```{r bmorevis_mapcol2, echo=FALSE, message=FALSE, warning=FALSE}
 
 #2022 Majority Non-White
 ggplot() +
@@ -438,18 +377,23 @@ ggplot() +
 
 ```
 
-</div>
 :::
+
+::::
 
 Baltimore is less than an hour North of Annapolis, MD (the state capital) and Washington, DC as the crow drives. Baltimore/Washington International Airport (BWI) does not lie within Baltimore City boundaries.
 
 # Defining Gentrification
 
-We define our Gentrification Index per CT as follows:
+Gentrification has many different definitions and connotations. At least part of its definition is intangible: often one can simply "feel" when a neighborhood has gentrified. At a glance, the clues may be found in the presence of new construction trying especially hard to look older, or in the manifestation of high-priced coffee shops and their hipster patrons where there were none before. 
 
-GI = (∆ Low Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value)
+Because We define our Gentrification Index per CT as follows:
+
+<center> GI = (∆ Low Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value) </center>
 
 The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification.
+
+We assume that if rent has increased between 2012 and 2022, that it will continue to increase, magnifying the gentrification of an area.
 
 ```{r callingincomedata, warning=FALSE, message=FALSE}
 #Getting population by Income numbers
@@ -538,20 +482,23 @@ all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")%>%
 
 ```{r gentrification_map, warning=FALSE, message=FALSE}
 
+all.acs.sf.g <- all.acs.sf %>%
+  dplyr::select(GEOID, gentrify) %>%
+  mutate(gentrify = as.factor(gentrify))
+
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = all.acs.sf, aes(fill = gentrify), col = "cornflowerblue") +
-  scale_fill_gradient(
-    high = "#174B86",
-    low = "#B4CFF5") +
+  geom_sf(data = all.acs.sf, aes(fill = as.factor(gentrify)), col = "#756059") +
+  scale_fill_manual(values = c("#5FA08F", "#F56A40"),
+                    labels = c("No", "Yes")) +
   geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
   theme_void() +
   xlim(-76.75, -76.48) +
   ylim(39.2, 39.38) +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Gentrification",
-       title = "2022 Gentrified Census Tracts",
+  labs(fill = "Gentrified?",
+       title = "2022 Gentrification per Census Tract",
        subtitle = "Baltimore City, MD")
 
 ```
@@ -564,24 +511,22 @@ For testing the ability to predict gentrification, input features that could be 
 The specific features pulled based on this criteria were:
 
 _Baltimore City Open Bid List_
-This feature includes city owned vacant lots and properties with vacant building notices. 
+The Baltimore Bids feature includes city owned vacant lots and properties with vacant building notices. 
 
 _Universities and Colleges_ 
-This feature includes the locations of universities and colleges in Baltimore. 
+The colleges feature includes the locations of universities and colleges in Baltimore. 
 
 _Businesses_ 
-This feature contains the count of businesses in each community statistical area (CSA), which is a geographic measurement developed by the Baltimore City Planning Department to define neighborhood clusters. 
+The businesses feature contains the count of businesses in each community statistical area (CSA), which is a geographic measurement developed by the Baltimore City Planning Department to define neighborhood clusters. Ths model also includes a change in businesses feature, which accounts for the change in count of businesses per CSA from 2010 to 2019. 
 
 _Vacant Lots_ 
-This feature includes the percentage of vacant lots per CSA. 
+The vacant lots feature includes the percentage of vacant lots per CSA. 
 
 _Baltimore Schools_ 
 The schools feature highlights the percentage of students per CSA who exceeded or met the Partnership for Assessment of Readiness for College and Careers (PARCC) math expectations. 
 
 _Walk Score_
-The walk score feature includes the average walk score by CSA. 
-
-I will include more stuff about the features we created from the datasets. - Tina 
+The walk score feature includes the average walk score by CSA and the change in walk score from 2017 to 2011.
 
 ```{r bmore_data, message=FALSE, warning=FALSE, cache=TRUE, include=FALSE}
 
@@ -637,6 +582,10 @@ crime <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/serv
 
 ```
 
+::: {style="display: flex;"}
+
+::: {}
+
 ```{r feature_mapcol1, message=FALSE, warning=FALSE}
 
 #change in walk score
@@ -656,7 +605,43 @@ ggplot() +
        title = "2011 to 2017 Change in Walk Score",
        subtitle = "Baltimore City, MD")
 
+#percent change in hosuing units
+huchange <- all.acs.sf %>%
+  dplyr::select(HUnitsPctChange, GEOID) %>%
+  dplyr::mutate(HUnitsPctChange = HUnitsPctChange/100)
+
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = huchange, aes(fill = HUnitsPctChange), col = "transparent") +
+  scale_fill_gradient(
+    high = "#864259",
+    low = "#F5A6C3", 
+    labels = scales::percent) +
+  geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Percent Change",
+       title = "2017 to 2022 Percent Change in Number of Housing Units",
+       subtitle = "Baltimore City, MD")
+
 ```
+
+:::
+
+::: {}
+
+```{r feature_mapcol2, message=FALSE, warning=FALSE}
+
+
+
+```
+
+:::
+
+::::
 
 ## Joining additional metrics
 
@@ -946,3 +931,7 @@ tm_polygons(col = "Prediction")
 
 
 # Conclusion
+
+Measuring gentrification can be challenging, primarily due to the complexity of its definition. However, this model addresses this challenge by focusing on observable characteristics that the average resident can recognize. While advanced statistical models may have policy implications, the primary aim of this model is to empower city officials and residents to identify gentrification in their neighborhoods early on and take proactive steps to prevent displacement before it becomes a pressing issue.
+
+The results of the model indicate…
