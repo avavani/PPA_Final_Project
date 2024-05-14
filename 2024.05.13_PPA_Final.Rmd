@@ -888,3 +888,7 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
 ```
 
 # Conclusion
+
+Measuring gentrification can be challenging, primarily due to the complexity of its definition. However, this model addresses this challenge by focusing on observable characteristics that the average resident can recognize. While advanced statistical models may have policy implications, the primary aim of this model is to empower city officials and residents to identify gentrification in their neighborhoods early on and take proactive steps to prevent displacement before it becomes a pressing issue.
+
+The results of the model indicate…
