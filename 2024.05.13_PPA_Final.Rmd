@@ -201,6 +201,8 @@ all.acs <- bmore_acs17 %>%
 
 Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 people (2020 Census). An incredibly historic city, though Baltimore was once full of rigorous industry, unbridled American patriotism, and wealth, its late 20th century reality was plagued by extreme disinvestment, high crime, and white flight.
 
+Baltimore City is considered one of the most segregated cities in the United States, where neighborhoods are often predominantly white or predominantly Black and Hispanic. Coined, "The Butterfly Effect," the central spine running North-South is where communities are majority-white, have higher median incomes, and typically have lower health risks. The wings of Baltimore are where rents and home values are low are where more people of color live. 
+
 ::: {style="display: flex;"}
 
 ::: {}
