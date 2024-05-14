@@ -846,7 +846,7 @@ The higher peak to the left in the top chart indicates that the model is more co
 
 The more evenly distributed curve in the bottom chart suggests that the model's predicted probabilities for gentrification instances (class 1) are spread out across a wider range. The slight peak between 0.5 and 0.75 indicates that there are instances where the model predicts a moderate to high likelihood of gentrification, but with some variability.
 
-Overall, these patterns highlight that the model has greater confidence identifying non-gentrification over gentrification. 
+These patterns highlight that the model has greater confidence identifying non-gentrification over gentrification. 
 
 ## Model Performance
 
