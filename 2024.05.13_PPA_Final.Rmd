@@ -15,6 +15,7 @@ output:
 ---
 
 # Abstract
+
 Defining and predicting gentrification is becoming more and more relevant to the average person as neighborhood residents become more concerned about getting priced out of their communities. Once something that could only be observed in hindsight, anticipating gentrification and attempting to prevent its disparate effects has become the subject of activism and counter-lobbying efforts. This report attempts to determine if gentrification can be correctly identified in Baltimore City, Maryland based on neighborhood characteristics that the average person can observe.
 
 ```{r setup, include=FALSE}
@@ -188,6 +189,7 @@ all.acs <- bmore_acs17 %>%
 ```
 
 # About Baltimore City
+
 Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 people (2020 Census). An incredibly historic city, though Baltimore was once full of rigorous industry, unbridled American patriotism, and wealth, its late 20th century reality was plagued by extreme disinvestment, high crime, and white flight.
 
 ```{r bmorevis_data, message=FALSE, warning=FALSE}
@@ -253,9 +255,8 @@ bmore_rent22 <- get_acs(
 
 ```
 
-:::: {style="display: flex;"}
-
-::: {}
+::: {style="display: flex;"}
+<div>
 
 ```{r bmorevis_mapcol1, message=FALSE, warning=FALSE}
 
@@ -358,9 +359,9 @@ ggplot() +
 
 ```
 
-:::
+</div>
 
-::: {}
+<div>
 
 ```{r bmorevis_mapcol2, message=FALSE, warning=FALSE}
 
@@ -420,19 +421,18 @@ ggplot() +
 
 ```
 
+</div>
 :::
-
-::::
 
 Baltimore is less than an hour North of Annapolis, MD (the state capital) and Washington, DC as the crow drives. Baltimore/Washington International Airport (BWI) does not lie within Baltimore City boundaries.
 
 # Defining Gentrification
+
 We define our Gentrification Index per CT as follows:
 
-GI = (∆ Low Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value) 
+GI = (∆ Low Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value)
 
-The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification. 
-
+The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification.
 
 ```{r callingincomedata}
 #Getting population by Income numbers
@@ -520,8 +520,30 @@ tm_shape(all.acs.sf) +
 ```
 
 # Data Collection
-For testing the ability to predict gentrification, input features that could be observed by eye were sourced, cleaned, and used in the model. Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
 
+For testing the ability to predict gentrification, input features that could be observed by eye were sourced, cleaned, and used in the model. Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (<https://data.baltimorecity.gov/>).
+
+The specific features pulled based on this criteria were:
+
+_Baltimore City Open Bid List_
+This feature includes city owned vacant lots and properties with vacant building notices. 
+
+_Universities and Colleges_ 
+This feature includes the locations of universities and colleges in Baltimore. 
+
+_Businesses_ 
+This feature contains the count of businesses in each community statistical area (CSA), which is a geographic measurement developed by the Baltimore City Planning Department to define neighborhood clusters. 
+
+_Vacant Lots_ 
+This feature includes the percentage of vacant lots per CSA. 
+
+_Baltimore Schools_ 
+The schools feature highlights the percentage of students per CSA who exceeded or met the Partnership for Assessment of Readiness for College and Careers (PARCC) math expectations. 
+
+_Walk Score_
+The walk score feature includes the average walk score by CSA. 
+
+I will include more stuff about the features we created from the datasets. - Tina 
 ```{r bmore_data, message=FALSE, warning=FALSE, cache=TRUE}
 
 #Open-Bid List - Vacants to Value 
@@ -654,7 +676,6 @@ acs.hoods <- acs.hoods %>%
          across(where(is.character), ~replace_na(., "Unknown")))
 ```
 
-
 # Model Development & Testing
 
 ```{r modelling, warning=FALSE, message=FALSE}
@@ -708,7 +729,7 @@ stargazer(reg.gentrify, type = "text", out = "regression_summary.txt", title = "
           notes.align = "l", notes.label = "Significance levels:")
 ```
 
-Testing the outcomes. 
+Testing the outcomes.
 
 ```{r confusionmatrix, warning=FALSE, message=FALSE}
 testProbs <- 
@@ -746,7 +767,7 @@ ggplot(testProbs, aes(x = probs, fill = as.factor(class))) +
 
 # Validation
 
-More of the stuff. This time calling up a ROC curve. 
+More of the stuff. This time calling up a ROC curve.
 
 ```{r ROCcurve, warning=FALSE, message=FALSE}
 p_load(pROC)
