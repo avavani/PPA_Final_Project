@@ -840,6 +840,7 @@ ggplot(testProbs, aes(x = probs, fill = as.factor(class))) +
         plot.subtitle = element_text(size = 12),
         plot.caption = element_text(size = 8))
 ```
+
 The higher peak to the left in the top chart indicates that the model is more confident in predicting non-gentrification instances (class 0) with lower probabilities (closer to 0). This suggests that there are clear features or patterns in the data that the model identifies as indicative of non-gentrification.
 
 The more evenly distributed curve in the bottom chart suggests that the model's predicted probabilities for gentrification instances (class 1) are spread out across a wider range. The slight peak between 0.5 and 0.75 indicates that there are instances where the model predicts a moderate to high likelihood of gentrification, but with some variability.
@@ -907,6 +908,7 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
         plot.subtitle = element_text(size = 12),
         plot.caption = element_text(size = 8))
 ```
+
 The threshold performance curve further provides insights into the model's behavior. As shown in graph below, the accuracy, true positive rate (TPR), and false positive rate (FPR) vary with percentile cut off threshold use for creating our binary gentrification variable.
 
 At lower percentiles, the model is more likely to classify tracts as gentrifying, which increases the TPR but also leads to a higher FPR. This indicates that while the model captures more tracts that do gentrify, it also generates more false positives. As the threshold increases, the TPR decreases while the FPR also decreases, meaning the model becomes more conservative in predicting gentrification, thus reducing the number of false positives but also missing some true positives.
@@ -1009,6 +1011,7 @@ ggplot() +
        subtitle = "Baltimore City, MD")
 
 ```
+
 Interestingly, some of the tracts with the highest MAE are also the tracts with the strongest predicted Gentrification Index, once again highlighting our model's weakness when it comes to true positives.
 
 
@@ -1020,6 +1023,10 @@ The results of the model indicate factors such as increased housing units, large
 
 The model's accuracy rate of 78% highlights its potential use as a tool to identify at-risk neighborhoods. Currently, it excels more in predicting indicators that an area is not undergoing gentrification, however, fine-tuning the model with adjusted thresholds could lead to a more cohesive and accurate prediction of areas at risk. While the model could use further refinement, it serves as an initial step towards providing insights into visible indicators of gentrification for city officials and local residents to empower communities and curb displacement. 
 
+
+# Works Cited
+
+"The Black Butterfly": Racial Segregation and Investment Patterns in Baltimore (https://apps.urban.org/features/baltimore-investment-flows/)
 
 
 
