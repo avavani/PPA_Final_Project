@@ -17,7 +17,7 @@ output:
 # Abstract
 Defining and predicting gentrification is becoming more and more relevant to the average person as neighborhood residents become more concerned about getting priced out of their communities. Once something that could only be observed in hindsight, anticipating gentrification and attempting to prevent its disparate effects has become the subject of activism and counter-lobbying efforts. This report attempts to determine if gentrification can be correctly identified in Baltimore City, Maryland based on neighborhood characteristics that the average person can observe.
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, , warning=FALSE, message=FALSE, cache=TRUE}
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 library(pacman)
 p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
@@ -192,7 +192,7 @@ all.acs <- bmore_acs17 %>%
 # About Baltimore City
 Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 people (2020 Census). An incredibly historic city, though Baltimore was once full of rigorous industry, unbridled American patriotism, and wealth, its late 20th century reality was plagued by extreme disinvestment, high crime, and white flight.
 
-```{r bmorevis_data, message=FALSE, warning=FALSE}
+```{r bmorevis_data, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 
 #2022 Median Household Income
 bmore_hhinc22 <- get_acs(
@@ -545,7 +545,7 @@ ggplot() +
 # Data Collection
 For testing the ability to predict gentrification, input features that could be observed by eye were sourced, cleaned, and used in the model. Our data sources primarily included the 2012 and 2022 5-year ACS (American Community Survey) from the U.S. Census Bureau and Open Baltimore (https://data.baltimorecity.gov/). 
 
-```{r bmore_data, message=FALSE, warning=FALSE, cache=TRUE}
+```{r bmore_data, message=FALSE, warning=FALSE, cache=TRUE, include=FALSE}
 
 #Open-Bid List - Vacants to Value 
 bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")%>%
