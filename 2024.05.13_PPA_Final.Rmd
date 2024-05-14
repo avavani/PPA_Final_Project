@@ -154,7 +154,9 @@ bmore_acs17 <- bmore_acs17 %>%
                        "Census Tract 1802, Baltimore city, Maryland"))) %>%
   bind_rows(changed_22)
 
+```
 
+```{r finalacs, include=FALSE, warning=FALSE, message=FALSE}
 all.acs <- bmore_acs17 %>%
   left_join(bmore_acs22, by = "GEOID") %>%
   mutate(
@@ -194,16 +196,11 @@ all.acs <- bmore_acs17 %>%
   select(-NAME.x, -NAME.y) %>%
   mutate(across(where(is.numeric), ~replace_na(., 0)),
          across(where(is.numeric), ~replace(., is.infinite(.), 0))) 
-
 ```
 
 # About Baltimore City
 
 Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 people (2020 Census). An incredibly historic city, though Baltimore was once full of rigorous industry, unbridled American patriotism, and wealth, its late 20th century reality was plagued by extreme disinvestment, high crime, and white flight.
-
-::: {style="display: flex;"}
-
-::: {}
 
 ```{r tragedy, message=FALSE, warning=FALSE, include=FALSE}
 
@@ -265,6 +262,7 @@ bmore_rent22 <- get_acs(
   geometry = TRUE 
 ) %>%
   select(GEOID, estimate)
+
 ```
 
 ```{r bmorevis_mapcol1, echo=FALSE, message=FALSE, warning=FALSE}
@@ -305,10 +303,6 @@ ggplot() +
        subtitle = "Baltimore City, MD")
 
 ```
-
-:::
-
-::: {}
 
 ```{r bmorevis_mapcol2, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -368,9 +362,6 @@ ggplot() +
 
 ```
 
-:::
-
-::::
 
 Baltimore is less than an hour North of Annapolis, MD (the state capital) and Washington, DC as the crow drives. Baltimore/Washington International Airport (BWI) does not lie within Baltimore City boundaries.
 
@@ -471,7 +462,6 @@ all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")%>%
 ```
 
 ```{r gentrification_map, warning=FALSE, message=FALSE}
-
 all.acs.sf.g <- all.acs.sf %>%
   dplyr::select(GEOID, gentrify) %>%
   mutate(gentrify = as.factor(gentrify))
@@ -563,16 +553,8 @@ walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest
 walk_score_csa <- walk_score %>%
   st_drop_geometry()
 walk_score_csa <- left_join(bmorecsa, walk_score_csa, by = c("Community" = "CSA"))
-
-#crime
-crime <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Part1_Crime_Beta/FeatureServer/0/query?where=1%3D1&outFields=CrimeCode,Description,Weapon,Post,Location,Latitude,Longitude,GeoLocation,Total_Incidents,CCNumber,CrimeDateTime&outSR=4326&f=json")
-  
-
 ```
 
-::: {style="display: flex;"}
-
-::: {}
 
 ```{r feature_mapcol1, message=FALSE, warning=FALSE}
 
@@ -617,9 +599,6 @@ ggplot() +
 
 ```
 
-:::
-
-::: {}
 
 ```{r feature_mapcol2, message=FALSE, warning=FALSE}
 
@@ -640,9 +619,6 @@ ggplot() +
 
 ```
 
-:::
-
-::::
 
 ## Logistic Regression
 
@@ -906,9 +882,11 @@ ggplot(testProbs.thresholds, aes(x = Threshold)) +
 
 # Cross Validation
 
-Overall, our model 
+Overall, our model shows strong generalizability in predicting gentrification across different geographic regions. Running a Spatial Cross Validation finds our MAE to be 0.417, showing relative robustness across the different census tracts.
+
 ```{r spatialcrossval, message=FALSE, warning=FALSE, include=FALSE}
-acs.cv <- acs.hoods %>%
+acs.cv <- acs.hoods
+acs.cv <- acs.cv %>%
 left_join(baltimore_tracts)%>%
   mutate(across(where(is.numeric), ~replace_na(., 0)),
          across(where(is.numeric), ~replace(., is.infinite(.), 0)))%>%
@@ -928,26 +906,42 @@ reg.vars <- c("TotalPopulation17", "TotalHousingUnits17",
                       "p_vacant", "tractbids", "walk_school",
                       "business2", "upcoming")
 
+p_load(kableExtra)
 reg.spatialCV <- crossValidate(
   dataset = acs.cv,
   id = "GEOID",
   dependentVariable = "gentrify",
   indVariables = reg.vars)%>%
-select(GEOID, gentrify, Prediction)%>%
-mutate(error = Prediction - gentrify)
+select(GEOID, gentrify, Prediction)
 
 reg.summary <- reg.spatialCV %>%
 group_by(GEOID)%>%
-summarize(Mean_Error = mean(Prediction - , na.rm = T),
-              MAE = mean(abs(Mean_Error), na.rm = T),
-              SD_MAE = mean(abs(Mean_Error), na.rm = T))
+summarize(Mean_Error = mean(Prediction - gentrify, na.rm = T))
+mean(reg.summary$MAE)
+```
 
-#tm_shape(reg.spatialCV)+
-#tm_polygons(col = "Prediction")
+Looking at the geographic distribution of our MAE, we find that certain census tracts show higher MAE than another. This could be due to the implicit conditions present within these tracts that are not identified in the model. In the future, further research on Baltimore as well as its intra-tract variation could help decrease MAE across the city.
+
+```{r MAE_map, warning=FALSE, message=FALSE}
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = reg.summary, aes(fill = MAE), col = "transparent") +
+  scale_fill_gradient(
+    high = "#fb6f92",
+    low = "#ffe5ec") +
+  geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "MAE",
+       title = "Mean Absolute Error by Census Tract",
+       subtitle = "Baltimore City, MD")
+
 ```
 
 ```{r prediction_map, warning=FALSE, message=FALSE}
-
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
@@ -965,6 +959,7 @@ ggplot() +
        subtitle = "Baltimore City, MD")
 
 ```
+Interestingly, some of the tracts with the highest MAE are also the tracts with the strongest predicted Gentrification Index, once again highlighting our model's weakness when it comes to true positives.
 
 
 # Conclusion
