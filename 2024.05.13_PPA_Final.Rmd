@@ -607,7 +607,7 @@ ggplot() +
        title = "2011 to 2017 Change in Walk Score",
        subtitle = "Baltimore City, MD")
 
-#percent change in hosuing units
+#percent change in housing units
 huchange <- all.acs.sf %>%
   dplyr::select(HUnitsPctChange, GEOID) %>%
   dplyr::mutate(HUnitsPctChange = HUnitsPctChange/100)
@@ -637,7 +637,20 @@ ggplot() +
 
 ```{r feature_mapcol2, message=FALSE, warning=FALSE}
 
+#colleges
 
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
+  geom_sf(data = bmore_colleges, col = "orange", fill = "orange4", shape = 25, size = 3, alpha = 0.8) +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Change in Walk Score",
+       title = "2011 to 2017 Change in Walk Score",
+       subtitle = "Baltimore City, MD")
 
 ```
 
@@ -958,7 +971,7 @@ ggplot() +
   xlim(-76.75, -76.48) +
   ylim(39.2, 39.38) +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Gentrification Index",
+  labs(fill = "Predicted GI",
        title = "Predicted Gentrification Index",
        subtitle = "Baltimore City, MD")
 
