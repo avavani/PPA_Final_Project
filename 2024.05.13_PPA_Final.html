@@ -2026,13 +2026,11 @@ model’s behavior. As shown in graph below, the accuracy, true positive
 rate (TPR), and false positive rate (FPR) vary with percentile cut off
 threshold use for creating our binary gentrification variable.</p>
 <p>At lower percentiles, the model is more likely to classify tracts as
-gentrifying, which increases the TPR but also leads to a higher FPR.
-This indicates that while the model captures more tracts that do
-gentrify, it also generates more false positives. As the percentile
-increases, the TPR decreases while the FPR also decreases, meaning the
-model becomes more conservative in predicting gentrification, thus
-reducing the number of false positives but also missing some true
-positives.</p>
+gentrifying, which increases the TPR but also leads to a higher FPR. As
+the percentile increases, the TPR decreases while the FPR also
+decreases, meaning the model becomes more conservative in predicting
+gentrification, thus reducing the number of false positives but also
+missing some true positives.</p>
 <p>For the purposes of this project, we focused on minimizing false
 positives, which led to our high cutoff percentile of 75%. However, in
 the future, this threshold can be adjusted to meet different objectives.
