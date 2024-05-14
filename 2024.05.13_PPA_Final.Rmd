@@ -728,7 +728,6 @@ all.acs.reg <- acs.hoods
 all.acs.reg <- all.acs.reg %>%
   select(-(ends_with("22")),
          -(ends_with("12")),
-         -(ends_with("17")),
          -genindex,
          -CSA,
          -RentPctChange,
@@ -736,7 +735,6 @@ all.acs.reg <- all.acs.reg %>%
          -MedianRent17,
          -MedianHouseholdIncome17,
          -MedianRent22,
--MovedWithinCounty17,
 -BachelorsDegree17,
          -MedianHouseholdIncome22,
          -MedianHomeValue22,
@@ -749,17 +747,21 @@ all.acs.reg <- all.acs.reg %>%
          -OwnerOccupiedHouseholdSize17,
          -RenterOccupiedSize17,
          -MedianHomeValue17,
--CountyWWMovePct17,
 -SStateMovePct17,
 -DiffStateMovePct17,
+-WhiteAlonePct17,
 -AbroadMovePct17,
 -BachelorsPct17,
          -inflation.adjHH17,
          -FamilyHouseholds17,
          -NonFamilyHouseholds17,
-         -VacantHousingUnits17)%>%
+-VacantUnitsPctChange)%>%
 mutate(walk_school = p_students * walk_score)%>%
-mutate(business2 = business_count * (changebiz*3))
+mutate(business2 = changebiz ^2)%>%
+select(-p_students,
+-walk_score,
+-changebiz,
+-business_count)
 
 train <- all.acs.reg %>%
   sample_frac(.75)
