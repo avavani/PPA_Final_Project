@@ -5,3 +5,10 @@ sf
 tidycensus
 tidyr
 tigris
+tidyverse
+tibble
+readr
+purrr
+stringr
+forcats
+lubridate
