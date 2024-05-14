@@ -853,6 +853,7 @@ ggplot(testProbs, aes(x = probs, fill = as.factor(class))) +
         plot.caption = element_text(size = 8))
 ```
 
+
 The higher peak to the left in the top chart indicates that the model is more confident in predicting non-gentrification instances (class 0) with lower probabilities (closer to 0). This suggests that there are clear features or patterns in the data that the model identifies as indicative of non-gentrification.
 
 The more evenly distributed curve in the bottom chart suggests that the model's predicted probabilities for gentrification instances (class 1) are spread out across a wider range. The slight peak between 0.5 and 0.75 indicates that there are instances where the model predicts a moderate to high likelihood of gentrification, but with some variability.
@@ -920,6 +921,7 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
         plot.subtitle = element_text(size = 12),
         plot.caption = element_text(size = 8))
 ```
+
 The threshold performance curve further provides insights into the model's behavior. As shown in graph below, the accuracy, true positive rate (TPR), and false positive rate (FPR) vary with percentile cut off threshold use for creating our binary gentrification variable.
 
 At lower percentiles, the model is more likely to classify tracts as gentrifying, which increases the TPR but also leads to a higher FPR. As the percentile increases, the TPR decreases while the FPR also decreases, meaning the model becomes more conservative in predicting gentrification, thus reducing the number of false positives but also missing some true positives.
@@ -1022,7 +1024,7 @@ ggplot() +
 
 ```
 
-Interestingly, some of the tracts with the highest MAE are also the tracts with the strongest predicted Gentrification Index, despite not being classified as gentrified by our threshold. These tracts generally seem to be neighboring actually gentrifying tracts. This discrepancy may be due to hidden spatial autocorrelation—tracts near other gentrifying tracts may experience similar forces, though not at the same scale. This spatial spillover effect suggests that while these tracts do not meet the gentrification threshold, they are influenced by nearby gentrification activities, which our model captures. In the future, we would be interested in accounting for these spatial autocorrelations.
+Interestingly, some of the tracts with the highest MAE are also the tracts with the strongest predicted Gentrification Index, once again highlighting our model's weakness when it comes to true positives.
 
 
 # Conclusion
@@ -1032,3 +1034,14 @@ Measuring gentrification can be challenging, primarily due to the complexity of 
 The results of the model indicate factors such as increased housing units, larger owner-occupied household sizes, and income growth correlate with a greater risk of gentrification in Baltimore City, Maryland. These insights align with the literature on gentrification and most of these changes could be observed by the average resident.  
 
 The model's accuracy rate of 78% highlights its potential use as a tool to identify at-risk neighborhoods. Currently, it excels more in predicting indicators that an area is not undergoing gentrification, however, fine-tuning the model with adjusted thresholds could lead to a more cohesive and accurate prediction of areas at risk. While the model could use further refinement, it serves as an initial step towards providing insights into visible indicators of gentrification for city officials and local residents to empower communities and curb displacement. 
+
+
+# Works Cited
+
+"The Black Butterfly": Racial Segregation and Investment Patterns in Baltimore (https://apps.urban.org/features/baltimore-investment-flows/)
+
+
+
+
+
+
