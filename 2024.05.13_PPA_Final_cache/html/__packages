@@ -12,3 +12,5 @@ purrr
 stringr
 forcats
 lubridate
+mapview
+tmap
