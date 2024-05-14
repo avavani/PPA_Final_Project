@@ -469,7 +469,7 @@ all.acs <- all.acs %>%
   mutate(genindex = ((ChangeInHighIncPct + HomeValuePctChange + RentPctChange)))
 
 all.acs <- all.acs %>%
-mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.70, na.rm = TRUE)))~ 1,
+mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.75, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
 
@@ -732,25 +732,29 @@ all.acs.reg <- all.acs.reg %>%
          -percentHighInc12,
          -WhiteAlone17,
          -GradProfessionalDegree17,
+-MovedWithinCounty17,
          -MovedAbroad17,
          -OwnerOccupiedHouseholdSize17,
          -RenterOccupiedSize17,
          -MedianHomeValue17,
--SStateMovePct17,
 -DiffStateMovePct17,
 -WhiteAlonePct17,
 -AbroadMovePct17,
--BachelorsPct17,
+-collegedist,
+-SStateMovePctChange,
          -inflation.adjHH17,
-         -FamilyHouseholds17,
          -NonFamilyHouseholds17,
 -VacantUnitsPctChange)%>%
 mutate(walk_school = p_students * walk_score)%>%
 mutate(business2 = changebiz ^2)%>%
+mutate(upcoming = (changewalk * SStateMovePct17))%>%
 select(-p_students,
 -walk_score,
 -changebiz,
--business_count)
+-business_count,
+-changewalk)
+
+set.seed(777)
 
 train <- all.acs.reg %>%
   sample_frac(.75)
@@ -892,6 +896,41 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
         plot.subtitle = element_text(size = 12),
         plot.caption = element_text(size = 8))
 ```
+# Cross Validation
+
+```{r spatialcrossval, warning=FALSE, message=FALSE}
+acs.cv <- acs.hoods %>%
+left_join(baltimore_tracts)%>%
+  mutate(across(where(is.numeric), ~replace_na(., 0)),
+         across(where(is.numeric), ~replace(., is.infinite(.), 0)))%>%
+mutate(walk_school = p_students * walk_score,
+business2 = changebiz ^2,
+upcoming = (changewalk * SStateMovePct17))
+
+reg.vars <- c("TotalPopulation17", "TotalHousingUnits17",
+                      "VacantHousingUnits17", "MovedFromSameState17", "MovedFromDifferentState17",
+                      "FamilyHouseholds17", "PopChangePct", "HUnitsPctChange",
+                      "IncPctChange", "GradPct17", "CountyWWMovePct17",
+                      "SStateMovePct17", "BachelorsPct17", "WhiteAlonePctChange",
+                      "GradPctChange", "CountyWWMovePctChange", "DiffStateMovePctChange",
+                      "AbroadMovePctChange", "BachelorsPctChange", "OOSizePctChange",
+                      "ROSizePctChange", "FamHHPctChange", "NonFamHHPctChange",
+                      "ChangeInHighIncPct", "ChangeInLowIncPct", "gentrify",
+                      "p_vacant", "tractbids", "walk_school",
+                      "business2", "upcoming")
+
+reg.spatialCV <- crossValidate(
+  dataset = acs.cv,
+  id = "GEOID",
+  dependentVariable = "gentrify",
+  indVariables = reg.vars)%>%
+select(GEOID, gentrify, Prediction)%>%
+mutate(error = Prediction - gentrify)
+
+tm_shape(reg.spatialCV)+
+tm_polygons(col = "Prediction")
+```
+
 
 # Conclusion
 
