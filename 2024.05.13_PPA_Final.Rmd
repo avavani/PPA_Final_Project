@@ -18,10 +18,11 @@ output:
 
 Defining and predicting gentrification is becoming more and more relevant to the average person as neighborhood residents become more concerned about getting priced out of their communities. Once something that could only be observed in hindsight, anticipating gentrification and attempting to prevent its disparate effects has become the subject of activism and counter-lobbying efforts. This report attempts to determine if gentrification can be correctly identified in Baltimore City, Maryland based on neighborhood characteristics that the average person can observe.
 
-```{r setup, include=FALSE, , warning=FALSE, message=FALSE, cache=TRUE}
+```{r setup, include=FALSE, , warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 library(pacman)
-p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap, tidyverse)
+library(dplyr)
+p_load(ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap, tidyverse)
 ```
 
 ```{r geography, include=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
@@ -213,7 +214,7 @@ Baltimore City, Maryland sits on the Patapsco River and is home to over 585,000 
 
 ::: {}
 
-```{r bmorevis_mapcol1, echo=FALSE, message=FALSE, warning=FALSE}
+```{r tragedy, message=FALSE, warning=FALSE, include=FALSE}
 
 #2022 Median Household Income
 bmore_hhinc22 <- get_acs(
@@ -273,9 +274,9 @@ bmore_rent22 <- get_acs(
   geometry = TRUE 
 ) %>%
   select(GEOID, estimate)
+```
 
-
-
+```{r bmorevis_mapcol1, echo=FALSE, message=FALSE, warning=FALSE}
 #2022 Median Household Income
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
@@ -594,6 +595,28 @@ ggplot() +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
   labs(fill = "Change in Walk Score",
        title = "2011 to 2017 Change in Walk Score",
+       subtitle = "Baltimore City, MD")
+
+#percent change in hosuing units
+huchange <- all.acs.sf %>%
+  dplyr::select(HUnitsPctChange, GEOID) %>%
+  dplyr::mutate(HUnitsPctChange = HUnitsPctChange/100)
+
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = huchange, aes(fill = HUnitsPctChange), col = "transparent") +
+  scale_fill_gradient(
+    high = "#864259",
+    low = "#F5A6C3", 
+    labels = scales::percent) +
+  geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Percent Change of Housing Units",
+       title = "2017 to 2022 Percent Change in Housing Units",
        subtitle = "Baltimore City, MD")
 
 ```
