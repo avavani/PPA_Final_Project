@@ -852,6 +852,7 @@ ggplot(testProbs, aes(x = probs, fill = as.factor(class))) +
         plot.subtitle = element_text(size = 12),
         plot.caption = element_text(size = 8))
 ```
+
 The higher peak to the left in the top chart indicates that the model is more confident in predicting non-gentrification instances (class 0) with lower probabilities (closer to 0). This suggests that there are clear features or patterns in the data that the model identifies as indicative of non-gentrification.
 
 The more evenly distributed curve in the bottom chart suggests that the model's predicted probabilities for gentrification instances (class 1) are spread out across a wider range. The slight peak between 0.5 and 0.75 indicates that there are instances where the model predicts a moderate to high likelihood of gentrification, but with some variability.
@@ -921,7 +922,7 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
 ```
 The threshold performance curve further provides insights into the model's behavior. As shown in graph below, the accuracy, true positive rate (TPR), and false positive rate (FPR) vary with percentile cut off threshold use for creating our binary gentrification variable.
 
-At lower percentiles, the model is more likely to classify tracts as gentrifying, which increases the TPR but also leads to a higher FPR. This indicates that while the model captures more tracts that do gentrify, it also generates more false positives. As the percentile increases, the TPR decreases while the FPR also decreases, meaning the model becomes more conservative in predicting gentrification, thus reducing the number of false positives but also missing some true positives.
+At lower percentiles, the model is more likely to classify tracts as gentrifying, which increases the TPR but also leads to a higher FPR. As the percentile increases, the TPR decreases while the FPR also decreases, meaning the model becomes more conservative in predicting gentrification, thus reducing the number of false positives but also missing some true positives.
 
 For the purposes of this project, we focused on minimizing false positives, which led to our high cutoff percentile of 75%. However, in the future, this threshold can be adjusted to meet different objectives. For instance, our current model, with its high cutoff, is suitable for private developers looking to avoid investment in non-gentrifying neighborhoods. Conversely, if the model were to be used by a government agency to plan for rental assistance, the cutoff threshold would need to be lowered to reduce the risk of missing areas that might benefit from such programs.
 
@@ -1031,10 +1032,3 @@ Measuring gentrification can be challenging, primarily due to the complexity of 
 The results of the model indicate factors such as increased housing units, larger owner-occupied household sizes, and income growth correlate with a greater risk of gentrification in Baltimore City, Maryland. These insights align with the literature on gentrification and most of these changes could be observed by the average resident.  
 
 The model's accuracy rate of 78% highlights its potential use as a tool to identify at-risk neighborhoods. Currently, it excels more in predicting indicators that an area is not undergoing gentrification, however, fine-tuning the model with adjusted thresholds could lead to a more cohesive and accurate prediction of areas at risk. While the model could use further refinement, it serves as an initial step towards providing insights into visible indicators of gentrification for city officials and local residents to empower communities and curb displacement. 
-
-
-
-
-
-
-
