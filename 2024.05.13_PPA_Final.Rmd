@@ -786,7 +786,7 @@ The model's accuracy of 0.78 indicates that it correctly predicts gentrification
 
 Testing the outcomes.
 
-```{r confusionmatrix, warning=FALSE, message=FALSE}
+```{r confusionmatrix, warning=FALSE, message=FALSE, include=FALSE}
 testProbs <- 
   data.frame(class = test$gentrify,
              probs = predict(reg.gentrify, test, type = "response"))
@@ -798,7 +798,9 @@ testProbs %>%
   { caret::confusionMatrix(.$predClass, .$class, positive = "1") }
 ```
 
-More stuff
+Overall our model had accuracy of... and sensitivity of ....
+
+This distinction between sensitivity and specificity is further illustrated by the probability distribution graph below. Here, we see that our model's predictions are concentrated around 0 for tracts with no gentrification. However, its predictions for tracts with gentrification are more spread out, signifying its lack of reliability in identifying true positives.
 
 ```{r probdist, warning=FALSE, message=FALSE}
 p_load(ggplot2)
@@ -875,8 +877,8 @@ ggplot(testProbs.thresholds, aes(x = Threshold)) +
   geom_line(aes(y = Rate_TP, color = "True Positive Rate")) +
   geom_line(aes(y = Rate_FP, color = "False Positive Rate")) +
   scale_color_manual(values = c("Accuracy" = "blue", "True Positive Rate" = "green", "False Positive Rate" = "red")) +
-  labs(title = "Model Performance Across Different Thresholds",
-       x = "Threshold", y = "Rate") +
+  labs(title = "Model Performance Across Different Percentile Cutoffs",
+       x = "Percentile", y = "Rate") +
   theme_minimal() +
   theme(legend.title = element_blank(),
         legend.position = "bottom",
@@ -938,8 +940,28 @@ reg.spatialCV <- crossValidate(
 select(GEOID, gentrify, Prediction)%>%
 mutate(error = Prediction - gentrify)
 
-tm_shape(reg.spatialCV)+
-tm_polygons(col = "Prediction")
+#tm_shape(reg.spatialCV)+
+#tm_polygons(col = "Prediction")
+```
+
+```{r prediction_map, warning=FALSE, message=FALSE}
+
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = reg.spatialCV, aes(fill = Prediction), col = "transparent") +
+  scale_fill_gradient(
+    high = "#862805",
+    low = "#EC9D1F") +
+  geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Gentrification Index",
+       title = "Predicted Gentrification Index",
+       subtitle = "Baltimore City, MD")
+
 ```
 
 
