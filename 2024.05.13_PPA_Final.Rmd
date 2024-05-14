@@ -583,18 +583,17 @@ crime <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/serv
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = bmore_CSA_data, fill = "gray70", col = "gray60") +
-  geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
-  geom_sf(data = walk_score, aes(col = changewalk), size = 5, shape = 18) +
-  scale_color_gradient(
+  geom_sf(data = walk_score_csa, aes(fill = changewalk), col = "transparent") +
+  scale_fill_gradient(
     high = "#861D05",
     low = "#F5B5AC") +
+  geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
   theme_void() +
   xlim(-76.75, -76.48) +
   ylim(39.2, 39.38) +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(col = "Change in Walk Score",
-       title = "201? to 2022 Change in Walk Score",
+  labs(fill = "Change in Walk Score",
+       title = "2011 to 2017 Change in Walk Score",
        subtitle = "Baltimore City, MD")
 
 ```
