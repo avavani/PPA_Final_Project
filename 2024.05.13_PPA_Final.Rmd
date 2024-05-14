@@ -20,7 +20,7 @@ Defining and predicting gentrification is becoming more and more relevant to the
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 library(pacman)
-p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap)
+p_load(dplyr, ggplot2, sf, stats, tidycensus, tidyr, mapview, tigris, tmap, tidyverse, dplyr)
 ```
 
 ```{r geography, include=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
@@ -157,7 +157,7 @@ bmore_acs17 <- bmore_acs17 %>%
                        "Census Tract 1802, Baltimore city, Maryland"))) %>%
   bind_rows(changed_22)
 
-#creating large dataset
+
 all.acs <- bmore_acs17 %>%
   left_join(bmore_acs22, by = "GEOID") %>%
   mutate(
@@ -167,22 +167,37 @@ all.acs <- bmore_acs17 %>%
     RentPctChange = if_else(MedianRent17 != 0, ((MedianRent22 - MedianRent17) / MedianRent17) * 100, 0),
     HomeValuePctChange = if_else(MedianHomeValue17 != 0, ((MedianHomeValue22 - MedianHomeValue17) / MedianHomeValue17) * 100, 0),
     IncPctChange = if_else(MedianHouseholdIncome17 != 0, ((MedianHouseholdIncome22 - MedianHouseholdIncome17) / MedianHouseholdIncome17) * 100, 0),
-    WhiteAlonePctChange = if_else(WhiteAlone17 != 0, ((WhiteAlone22 - WhiteAlone17) / WhiteAlone17) * 100, 0),
-    GradPctChange = if_else(GradProfessionalDegree17 != 0, ((GradProfessionalDegree22 - GradProfessionalDegree17) / GradProfessionalDegree17) * 100, 0),
-    CountyWWMovePctChange = if_else(MovedWithinCounty17 != 0, ((MovedWithinCounty22 - MovedWithinCounty17) / MovedWithinCounty17) * 100, 0),
-    SStateMovePctChange = if_else(MovedFromSameState17 != 0, ((MovedFromSameState22 - MovedFromSameState17) / MovedFromSameState17) * 100, 0),
-    DiffStateMovePctChange = if_else(MovedFromDifferentState17 != 0, ((MovedFromDifferentState22 - MovedFromDifferentState17) / MovedFromDifferentState17) * 100, 0),
-    AbroadMovePctChange = if_else(MovedAbroad17 != 0, ((MovedAbroad22 - MovedAbroad17) / MovedAbroad17) * 100, 0),
-    BachelorsPctChange = if_else(BachelorsDegree17 != 0, ((BachelorsDegree22 - BachelorsDegree17) / BachelorsDegree17) * 100, 0),
-    OOSizePctChange = if_else(OwnerOccupiedHouseholdSize17 != 0, ((OwnerOccupiedHouseholdSize22 - OwnerOccupiedHouseholdSize17) / OwnerOccupiedHouseholdSize17) * 100, 0),
+    WhiteAlonePct17 = if_else(TotalPopulation17 != 0, WhiteAlone17 / TotalPopulation17 * 100, 0),
+    WhiteAlonePct22 = if_else(TotalPopulation22 != 0, WhiteAlone22 / TotalPopulation22 * 100, 0),
+    GradPct17 = if_else(TotalPopulation17 != 0, GradProfessionalDegree17 / TotalPopulation17 * 100, 0),
+    GradPct22 = if_else(TotalPopulation22 != 0, GradProfessionalDegree22 / TotalPopulation22 * 100, 0),
+    CountyWWMovePct17 = if_else(TotalPopulation17 != 0, MovedWithinCounty17 / TotalPopulation17 * 100, 0),
+    CountyWWMovePct22 = if_else(TotalPopulation22 != 0, MovedWithinCounty22 / TotalPopulation22 * 100, 0),
+    SStateMovePct17 = if_else(TotalPopulation17 != 0, MovedFromSameState17 / TotalPopulation17 * 100, 0),
+    SStateMovePct22 = if_else(TotalPopulation22 != 0, MovedFromSameState22 / TotalPopulation22 * 100, 0),
+    DiffStateMovePct17 = if_else(TotalPopulation17 != 0, MovedFromDifferentState17 / TotalPopulation17 * 100, 0),
+    DiffStateMovePct22 = if_else(TotalPopulation22 != 0, MovedFromDifferentState22 / TotalPopulation22 * 100, 0),
+    AbroadMovePct17 = if_else(TotalPopulation17 != 0, MovedAbroad17 / TotalPopulation17 * 100, 0),
+    AbroadMovePct22 = if_else(TotalPopulation22 != 0, MovedAbroad22 / TotalPopulation22 * 100, 0),
+    BachelorsPct17 = if_else(TotalPopulation17 != 0, BachelorsDegree17 / TotalPopulation17 * 100, 0),
+    BachelorsPct22 = if_else(TotalPopulation22 != 0, BachelorsDegree22 / TotalPopulation22 * 100, 0),
+    WhiteAlonePctChange = if_else(WhiteAlonePct17 != 0, ((WhiteAlonePct22 - WhiteAlonePct17) / WhiteAlonePct17) * 100, 0),
+    GradPctChange = if_else(GradPct17 != 0, ((GradPct22 - GradPct17) / GradPct17) * 100, 0),
+    CountyWWMovePctChange = if_else(CountyWWMovePct17 != 0, ((CountyWWMovePct22 - CountyWWMovePct17) / CountyWWMovePct17) * 100, 0),
+    SStateMovePctChange = if_else(SStateMovePct17 != 0, ((SStateMovePct22 - SStateMovePct17) / SStateMovePct17) * 100, 0),
+    DiffStateMovePctChange = if_else(DiffStateMovePct17 != 0, ((DiffStateMovePct22 - DiffStateMovePct17) / DiffStateMovePct17) * 100, 0),
+    AbroadMovePctChange = if_else(AbroadMovePct17 != 0, ((AbroadMovePct22 - AbroadMovePct17) / AbroadMovePct17) * 100, 0),
+    BachelorsPctChange = if_else(BachelorsPct17 != 0, ((BachelorsPct22 - BachelorsPct17) / BachelorsPct17) * 100, 0),
+     OOSizePctChange = if_else(OwnerOccupiedHouseholdSize17 != 0, ((OwnerOccupiedHouseholdSize22 - OwnerOccupiedHouseholdSize17) / OwnerOccupiedHouseholdSize17) * 100, 0),
     ROSizePctChange = if_else(RenterOccupiedSize17 != 0, ((RenterOccupiedSize22 - RenterOccupiedSize17) / RenterOccupiedSize17) * 100, 0),
     FamHHPctChange = if_else(FamilyHouseholds17 != 0, ((FamilyHouseholds22 - FamilyHouseholds17) / FamilyHouseholds17) * 100, 0),
     NonFamHHPctChange = if_else(NonFamilyHouseholds17 != 0, ((NonFamilyHouseholds22 - NonFamilyHouseholds17) / NonFamilyHouseholds17) * 100, 0)
   ) %>%
   mutate(NAME = coalesce(NAME.x, NAME.y)) %>%
-  select(-NAME.x, -NAME.y)%>%
-    mutate(across(where(is.numeric), ~replace_na(., 0)),
-         across(where(is.character), ~replace_na(., "Unknown")))
+  select(-NAME.x, -NAME.y) %>%
+  mutate(across(where(is.numeric), ~replace_na(., 0)),
+         across(where(is.numeric), ~replace(., is.infinite(.), 0))) 
+
 ```
 
 # About Baltimore City
@@ -473,8 +488,8 @@ bmore_colleges <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/
 #Businesses by community statistical areas 
 bmore_business <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiind/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")%>%
   mutate(changebiz = neiind19 - neiind10)%>%
-  select(CSA2010, neiind21, geometry, changebiz) %>%
-  rename(CSA = CSA2010, 
+  select(CSA2020, neiind21, geometry, changebiz) %>%
+  rename(CSA = CSA2020, 
          business_count = neiind21)
  
 #Percentage of vacant lots 
@@ -485,7 +500,7 @@ bmore_p_lots <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/re
 
 #Baltimore schools
 school_outcome <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")%>%
-  select(CSA2010, pread317, geometry) %>%
+select(CSA2010, pread317, geometry) %>%
   rename(CSA = CSA2010,
          p_students = pread317)%>%
   st_centroid()
@@ -498,10 +513,6 @@ walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest
          walk_score = wlksc17)%>%
   st_centroid()
 
-#crime
-crime <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Part1_Crime_Beta/FeatureServer/0/query?where=1%3D1&outFields=CrimeCode,Description,Weapon,Post,Location,Latitude,Longitude,GeoLocation,Total_Incidents,CCNumber,CrimeDateTime&outSR=4326&f=json")
-  
-
 ```
 
 
@@ -509,6 +520,7 @@ crime <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/serv
 
 ```{r}
 p_load(nngeo,FNN,tibble, caret)
+
 bmore_hoods <- bmore_p_lots %>%
   select(-p_vacant)
 
@@ -517,9 +529,15 @@ bmore_CSA_data <- bmore_p_lots %>%
   left_join(bmore_business)%>%
   st_as_sf()
 
-bmore_CSA_data <- st_join(bmore_CSA_data, school_outcome, left = TRUE)
+bmore_CSA_data <- st_join(bmore_CSA_data, school_outcome, left = TRUE)%>%
+  mutate(CSA = coalesce(CSA.x, CSA.y)) %>%
+  select(-CSA.x, -CSA.y)%>%
+mutate(across(everything(), ~replace_na(., 0)))
 
-bmore_CSA_data <- st_join(bmore_CSA_data, walk_score, left = TRUE)
+bmore_CSA_data <- st_join(bmore_CSA_data, walk_score, left = TRUE)%>%
+  mutate(CSA = coalesce(CSA.x, CSA.y)) %>%
+  select(-CSA.x, -CSA.y)%>%
+mutate(across(everything(), ~replace_na(., 0)))
 
 coldist <- baltimore_tracts
 coldist$nearest_college_index <- st_nearest_feature(coldist, bmore_colleges)
@@ -534,11 +552,9 @@ coldist <- coldist %>%
   st_drop_geometry()
 
 acs.hoods <- all.acs.sf %>%
-  st_transform(crs = st_crs(bmore_hoods))%>%
+  st_transform(crs = st_crs(bmore_CSA_data))%>%
   st_centroid()%>%
-  st_join(bmore_hoods, join = st_intersects)%>%
-  st_drop_geometry()%>%
-  left_join(bmore_CSA_data)%>%
+  st_join(bmore_CSA_data, join = st_intersects)%>%
   mutate(NAME = coalesce(NAME.x, NAME.y)) %>%
   select(-NAME.x, -NAME.y)
 
@@ -557,10 +573,7 @@ acs.hoods <- acs.hoods %>%
          -INTPTLAT,
          -INTPTLON,
          -NAME) %>%
-  mutate(CSA = coalesce(CSA.x, CSA.y)) %>%
-  select(-CSA.x, -CSA.y)%>%
   st_drop_geometry()%>%
-  select(-geometry)%>%
   left_join(bmore_bids)%>%
   mutate(across(where(is.numeric), ~replace_na(., 0)),
          across(where(is.character), ~replace_na(., "Unknown")))
@@ -571,9 +584,11 @@ acs.hoods <- acs.hoods %>%
 ```{r modelling, warning=FALSE, message=FALSE}
 p_load(stargazer)
 
-all.acs.reg <- acs.hoods %>%
+all.acs.reg <- acs.hoods 
+all.acs.reg <- all.acs.reg %>%
   select(-(ends_with("22")),
          -(ends_with("12")),
+         -(ends_with("17")),
          -genindex,
          -CSA,
          -RentPctChange,
@@ -581,6 +596,8 @@ all.acs.reg <- acs.hoods %>%
          -MedianRent17,
          -MedianHouseholdIncome17,
          -MedianRent22,
+-MovedWithinCounty17,
+-BachelorsDegree17,
          -MedianHouseholdIncome22,
          -MedianHomeValue22,
          -MedianHouseholdIncome22,
@@ -592,10 +609,17 @@ all.acs.reg <- acs.hoods %>%
          -OwnerOccupiedHouseholdSize17,
          -RenterOccupiedSize17,
          -MedianHomeValue17,
+-CountyWWMovePct17,
+-SStateMovePct17,
+-DiffStateMovePct17,
+-AbroadMovePct17,
+-BachelorsPct17,
          -inflation.adjHH17,
          -FamilyHouseholds17,
          -NonFamilyHouseholds17,
-         -VacantHousingUnits17)
+         -VacantHousingUnits17)%>%
+mutate(walk_school = p_students * walk_score)%>%
+mutate(business2 = business_count * (changebiz*3))
 
 train <- all.acs.reg %>%
   sample_frac(.75)
