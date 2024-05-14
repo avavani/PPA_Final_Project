@@ -385,11 +385,17 @@ Baltimore is less than an hour North of Annapolis, MD (the state capital) and Wa
 
 # Defining Gentrification
 
-We define our Gentrification Index per CT as follows:
+Gentrification has many different definitions and connotations. At least part of its definition is intangible: often one can simply "feel" when a neighborhood has gentrified. At a glance, the clues may be found in the presence of new construction trying especially hard to look older, or in the manifestation of high-priced coffee shops and their hipster patrons where there were none before. 
 
-GI = (∆ Low Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value)
+The United States Department of Housing and Urban Development defines gentrification as, "a form of neighborhood change that occurs when high-income groups move to low-income areas, potentially altering the cultural and financial landscape of the original neighborhood”. 
 
-The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification.
+Using this standard as a guide, we define our Gentrification Index per CT as follows:
+
+<center> GI = (∆ High Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value) </center>
+
+The change is calculated by subtracting the 2012 values from the 2022 values. The proportion of High Income residents per Census Tract is determined by tabulating the number of residents who make more than 80% of the AMI in Baltimore City alone during each given year. The change in Rent and Home Value were calculated based on median costs adjusted for inflation.
+
+Once sorted in order of their Gentrification Index, we determine that the top 30th percentile of Census Tracts are extreme enough in their exhibition of the Index's ingredients to be labeled as "gentrified."
 
 ```{r callingincomedata, warning=FALSE, message=FALSE}
 #Getting population by Income numbers
@@ -463,7 +469,7 @@ all.acs <- all.acs %>%
   mutate(genindex = ((ChangeInHighIncPct + HomeValuePctChange + RentPctChange)))
 
 all.acs <- all.acs %>%
-mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.70, na.rm = TRUE)))~ 1,
+mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.75, na.rm = TRUE)))~ 1,
          TRUE ~ 0))
 ```
 
@@ -619,8 +625,8 @@ ggplot() +
   xlim(-76.75, -76.48) +
   ylim(39.2, 39.38) +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Percent Change of Housing Units",
-       title = "2017 to 2022 Percent Change in Housing Units",
+  labs(fill = "Percent Change",
+       title = "2017 to 2022 Percent Change in Number of Housing Units",
        subtitle = "Baltimore City, MD")
 
 ```
@@ -728,25 +734,29 @@ all.acs.reg <- all.acs.reg %>%
          -percentHighInc12,
          -WhiteAlone17,
          -GradProfessionalDegree17,
+-MovedWithinCounty17,
          -MovedAbroad17,
          -OwnerOccupiedHouseholdSize17,
          -RenterOccupiedSize17,
          -MedianHomeValue17,
--SStateMovePct17,
 -DiffStateMovePct17,
 -WhiteAlonePct17,
 -AbroadMovePct17,
--BachelorsPct17,
+-collegedist,
+-SStateMovePctChange,
          -inflation.adjHH17,
-         -FamilyHouseholds17,
          -NonFamilyHouseholds17,
 -VacantUnitsPctChange)%>%
 mutate(walk_school = p_students * walk_score)%>%
 mutate(business2 = changebiz ^2)%>%
+mutate(upcoming = (changewalk * SStateMovePct17))%>%
 select(-p_students,
 -walk_score,
 -changebiz,
--business_count)
+-business_count,
+-changewalk)
+
+set.seed(777)
 
 train <- all.acs.reg %>%
   sample_frac(.75)
@@ -897,6 +907,41 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
         plot.subtitle = element_text(size = 12),
         plot.caption = element_text(size = 8))
 ```
+# Cross Validation
+
+```{r spatialcrossval, warning=FALSE, message=FALSE}
+acs.cv <- acs.hoods %>%
+left_join(baltimore_tracts)%>%
+  mutate(across(where(is.numeric), ~replace_na(., 0)),
+         across(where(is.numeric), ~replace(., is.infinite(.), 0)))%>%
+mutate(walk_school = p_students * walk_score,
+business2 = changebiz ^2,
+upcoming = (changewalk * SStateMovePct17))
+
+reg.vars <- c("TotalPopulation17", "TotalHousingUnits17",
+                      "VacantHousingUnits17", "MovedFromSameState17", "MovedFromDifferentState17",
+                      "FamilyHouseholds17", "PopChangePct", "HUnitsPctChange",
+                      "IncPctChange", "GradPct17", "CountyWWMovePct17",
+                      "SStateMovePct17", "BachelorsPct17", "WhiteAlonePctChange",
+                      "GradPctChange", "CountyWWMovePctChange", "DiffStateMovePctChange",
+                      "AbroadMovePctChange", "BachelorsPctChange", "OOSizePctChange",
+                      "ROSizePctChange", "FamHHPctChange", "NonFamHHPctChange",
+                      "ChangeInHighIncPct", "ChangeInLowIncPct", "gentrify",
+                      "p_vacant", "tractbids", "walk_school",
+                      "business2", "upcoming")
+
+reg.spatialCV <- crossValidate(
+  dataset = acs.cv,
+  id = "GEOID",
+  dependentVariable = "gentrify",
+  indVariables = reg.vars)%>%
+select(GEOID, gentrify, Prediction)%>%
+mutate(error = Prediction - gentrify)
+
+tm_shape(reg.spatialCV)+
+tm_polygons(col = "Prediction")
+```
+
 
 # Conclusion
 
