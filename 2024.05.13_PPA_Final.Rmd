@@ -841,25 +841,6 @@ aucTable <- testProbs %>%
   summarize(AUC = as.numeric(auc(roc(class, probs)))) %>% 
   mutate(AUC = as.character(round(AUC, 3)))
 
-mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
-  ggplot(aes(Rate_FP, Rate_TP)) + 
-  geom_point(aes(shape = pointSize)) + geom_line() + scale_shape_identity() +
-  geom_abline(slope = 1, intercept = 0, size = 1.5, color = 'grey') +
-  annotation_custom(tableGrob(aucTable, rows = NULL), xmin = .45, xmax = 1, ymin = 0, ymax = .45) +
-  labs(title="ROC Curve", x="False Positive Rate", y="True Positive Rate") +
-  plotTheme()+
-  theme(text = element_text(family = "Times New Roman", size = 12), 
-        plot.title = element_text(face = "bold", size = 14),
-        plot.subtitle = element_text(size = 12),
-        plot.caption = element_text(size = 8))
-```
-The threshold performance curve further provides insights into the model's behavior. As shown in graph below, the accuracy, true positive rate (TPR), and false positive rate (FPR) vary with percentile cut off threshold use for creating our binary gentrification variable.
-
-At lower percentiles, the model is more likely to classify tracts as gentrifying, which increases the TPR but also leads to a higher FPR. This indicates that while the model captures more tracts that do gentrify, it also generates more false positives. As the threshold increases, the TPR decreases while the FPR also decreases, meaning the model becomes more conservative in predicting gentrification, thus reducing the number of false positives but also missing some true positives.
-
-For the purposes of this project, we focused on minimizing false positives, which led to our high cutoff threshold. However, in the future, this threshold can be adjusted to meet different objectives. For instance, our current model, with its high cutoff, is suitable for private developers looking to invest in gentrifying neighborhoods. Conversely, if the model were to be used by a government agency to plan for rental assistance, the cutoff threshold would need to be lowered to reduce the risk of missing areas that might benefit from such programs.
-
-```{r thresholds, warning=FALSE, message=FALSE}
 iterateThresholds <- function(data, observedClass, predictedProbs) {
   observedClass <- enquo(observedClass)
   predictedProbs <- enquo(predictedProbs)
@@ -898,6 +879,25 @@ testProbs.thresholds <- iterateThresholds(
   predictedProbs = probs
 )
 
+mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
+  ggplot(aes(Rate_FP, Rate_TP)) + 
+  geom_point(aes(shape = pointSize)) + geom_line() + scale_shape_identity() +
+  geom_abline(slope = 1, intercept = 0, size = 1.5, color = 'grey') +
+  annotation_custom(tableGrob(aucTable, rows = NULL), xmin = .45, xmax = 1, ymin = 0, ymax = .45) +
+  labs(title="ROC Curve", x="False Positive Rate", y="True Positive Rate") +
+  plotTheme()+
+  theme(text = element_text(family = "Times New Roman", size = 12), 
+        plot.title = element_text(face = "bold", size = 14),
+        plot.subtitle = element_text(size = 12),
+        plot.caption = element_text(size = 8))
+```
+The threshold performance curve further provides insights into the model's behavior. As shown in graph below, the accuracy, true positive rate (TPR), and false positive rate (FPR) vary with percentile cut off threshold use for creating our binary gentrification variable.
+
+At lower percentiles, the model is more likely to classify tracts as gentrifying, which increases the TPR but also leads to a higher FPR. This indicates that while the model captures more tracts that do gentrify, it also generates more false positives. As the threshold increases, the TPR decreases while the FPR also decreases, meaning the model becomes more conservative in predicting gentrification, thus reducing the number of false positives but also missing some true positives.
+
+For the purposes of this project, we focused on minimizing false positives, which led to our high cutoff threshold. However, in the future, this threshold can be adjusted to meet different objectives. For instance, our current model, with its high cutoff, is suitable for private developers looking to invest in gentrifying neighborhoods. Conversely, if the model were to be used by a government agency to plan for rental assistance, the cutoff threshold would need to be lowered to reduce the risk of missing areas that might benefit from such programs.
+
+```{r thresholds, warning=FALSE, message=FALSE}
 ggplot(testProbs.thresholds, aes(x = Threshold)) +
   geom_line(aes(y = Accuracy, color = "Accuracy")) +
   geom_line(aes(y = Rate_TP, color = "True Positive Rate")) +
@@ -960,7 +960,7 @@ Looking at the geographic distribution of our MAE, we find that certain census t
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = reg.summary, aes(fill = MAE), col = "transparent") +
+  geom_sf(data = reg.summary, aes(fill = Mean_Error), col = "transparent") +
   scale_fill_gradient(
     high = "#fb6f92",
     low = "#ffe5ec") +
