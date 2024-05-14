@@ -259,7 +259,7 @@ bmore_rent22 <- get_acs(
 
 ::: {}
 
-```{r bmorevis_mapcol1, message=FALSE, warning=FALSE}
+```{r bmorevis_mapcol1, message=FALSE, warning=FALSE, include=FALSE}
 
 #2022 Median Household Income
 bmore_hhinc22 <- get_acs(
@@ -364,7 +364,7 @@ ggplot() +
 
 ::: {}
 
-```{r bmorevis_mapcol2, message=FALSE, warning=FALSE}
+```{r bmorevis_mapcol2, message=FALSE, warning=FALSE, include=FALSE}
 
 #2022 Majority Non-White
 ggplot() +
@@ -526,7 +526,7 @@ all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")%>%
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = all.acs.sf, aes(fill = gentrify), col = "gray60") +
+  geom_sf(data = all.acs.sf, aes(fill = gentrify), col = "cornflowerblue") +
   scale_fill_gradient(
     high = "#174B86",
     low = "#B4CFF5") +

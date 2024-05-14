@@ -1612,64 +1612,6 @@ over 585,000 people (2020 Census). An incredibly historic city, though
 Baltimore was once full of rigorous industry, unbridled American
 patriotism, and wealth, its late 20th century reality was plagued by
 extreme disinvestment, high crime, and white flight.</p>
-<pre class="r"><code>#2022 Median Household Income
-bmore_hhinc22 &lt;- get_acs(
-  geography = &quot;tract&quot;, 
-  variables = &quot;B19013_001&quot;,
-  state = &quot;MD&quot;, 
-  county = &quot;Baltimore City&quot;,
-  year = 2022,
-  geometry = TRUE 
-) %&gt;%
-  select(GEOID, estimate)</code></pre>
-<pre><code>##   |                                                                              |                                                                      |   0%  |                                                                              |=                                                                     |   2%  |                                                                              |===                                                                   |   4%  |                                                                              |=====                                                                 |   6%  |                                                                              |======                                                                |   8%  |                                                                              |=======                                                               |  10%  |                                                                              |========                                                              |  12%  |                                                                              |=========                                                             |  13%  |                                                                              |===========                                                           |  15%  |                                                                              |===========                                                           |  16%  |                                                                              |=============                                                         |  18%  |                                                                              |===============                                                       |  21%  |                                                                              |================                                                      |  23%  |                                                                              |=================                                                     |  24%  |                                                                              |==================                                                    |  26%  |                                                                              |====================                                                  |  28%  |                                                                              |=====================                                                 |  29%  |                                                                              |========================                                              |  34%  |                                                                              |==========================                                            |  36%  |                                                                              |==========================                                            |  37%  |                                                                              |============================                                          |  41%  |                                                                              |==============================                                        |  43%  |                                                                              |================================                                      |  46%  |                                                                              |==================================                                    |  49%  |                                                                              |===================================                                   |  51%  |                                                                              |=======================================                               |  56%  |                                                                              |========================================                              |  57%  |                                                                              |=========================================                             |  59%  |                                                                              |===========================================                           |  62%  |                                                                              |=============================================                         |  64%  |                                                                              |=============================================                         |  65%  |                                                                              |=================================================                     |  70%  |                                                                              |=====================================================                 |  75%  |                                                                              |========================================================              |  80%  |                                                                              |=========================================================             |  81%  |                                                                              |============================================================          |  86%  |                                                                              |================================================================      |  91%  |                                                                              |====================================================================  |  96%  |                                                                              |====================================================================  |  97%  |                                                                              |======================================================================| 100%</code></pre>
-<pre class="r"><code>#2022 Majority Non-White
-bmore_nonwhite22 &lt;- get_acs(
-  geography = &quot;tract&quot;, 
-  variables = c(tot = &quot;B03002_001&quot;, white = &quot;B03002_003&quot;),
-  state = &quot;MD&quot;, 
-  county = &quot;Baltimore City&quot;,
-  year = 2022,
-  geometry = TRUE
-) %&gt;%
-  select(GEOID, variable, estimate) %&gt;%
-  pivot_wider(names_from = variable, values_from = estimate) %&gt;%
-  mutate(nonwhite = 1 - (white/tot))
-
-#2022 Majority Owner
-bmore_pcentoo22 &lt;- get_acs(
-  geography = &quot;tract&quot;, 
-  variables = c(tot = &quot;B25003_001&quot;, oo = &quot;B25003_002&quot;, ro = &quot;B25003_003&quot;),
-  state = &quot;MD&quot;, 
-  county = &quot;Baltimore City&quot;,
-  year = 2022,
-  geometry = TRUE
-) %&gt;%
-  select(GEOID, variable, estimate) %&gt;%
-  pivot_wider(names_from = variable, values_from = estimate) %&gt;%
-  mutate(propoo = (oo/tot))
-
-#2022 Median Home Value
-bmore_hv22 &lt;- get_acs(
-  geography = &quot;tract&quot;, 
-  variables = &quot;B25077_001&quot;,
-  state = &quot;MD&quot;, 
-  county = &quot;Baltimore City&quot;,
-  year = 2022,
-  geometry = TRUE 
-) %&gt;%
-  select(GEOID, estimate)
-
-#2022 Median Rent
-bmore_rent22 &lt;- get_acs(
-  geography = &quot;tract&quot;, 
-  variables = &quot;B25031_001&quot;,
-  state = &quot;MD&quot;, 
-  county = &quot;Baltimore City&quot;,
-  year = 2022,
-  geometry = TRUE 
-) %&gt;%
-  select(GEOID, estimate)</code></pre>
 <div style="display: flex;">
 <div>
 <pre class="r"><code>#2022 Median Household Income
@@ -1681,9 +1623,9 @@ bmore_hhinc22 &lt;- get_acs(
   year = 2022,
   geometry = TRUE 
 ) %&gt;%
-  select(GEOID, estimate)
-
-#2022 Majority Non-White
+  select(GEOID, estimate)</code></pre>
+<pre><code>##   |                                                                              |                                                                      |   0%  |                                                                              |=                                                                     |   2%  |                                                                              |===                                                                   |   4%  |                                                                              |=====                                                                 |   6%  |                                                                              |======                                                                |   8%  |                                                                              |=======                                                               |  10%  |                                                                              |=========                                                             |  13%  |                                                                              |===========                                                           |  16%  |                                                                              |=============                                                         |  18%  |                                                                              |===============                                                       |  21%  |                                                                              |====================                                                  |  28%  |                                                                              |=====================                                                 |  29%  |                                                                              |=======================                                               |  32%  |                                                                              |==========================                                            |  36%  |                                                                              |==========================                                            |  37%  |                                                                              |==============================                                        |  43%  |                                                                              |===============================                                       |  45%  |                                                                              |===================================                                   |  51%  |                                                                              |======================================                                |  54%  |                                                                              |=========================================                             |  59%  |                                                                              |===========================================                           |  62%  |                                                                              |===============================================                       |  67%  |                                                                              |================================================                      |  69%  |                                                                              |=================================================                     |  70%  |                                                                              |==================================================                    |  72%  |                                                                              |=======================================================               |  78%  |                                                                              |=========================================================             |  81%  |                                                                              |==========================================================            |  83%  |                                                                              |===============================================================       |  89%  |                                                                              |==================================================================    |  94%  |                                                                              |======================================================================| 100%</code></pre>
+<pre class="r"><code>#2022 Majority Non-White
 bmore_nonwhite22 &lt;- get_acs(
   geography = &quot;tract&quot;, 
   variables = c(tot = &quot;B03002_001&quot;, white = &quot;B03002_003&quot;),
@@ -1923,104 +1865,6 @@ that could be observed by eye were sourced, cleaned, and used in the
 model. Our data sources primarily included the 2012 and 2022 5-year ACS
 (American Community Survey) from the U.S. Census Bureau and Open
 Baltimore (<a href="https://data.baltimorecity.gov/" class="uri">https://data.baltimorecity.gov/</a>).</p>
-<pre class="r"><code>#Open-Bid List - Vacants to Value 
-bmore_bids &lt;- st_read(&quot;https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&amp;where=1%3D1&amp;f=geojson&quot;)%&gt;%
-  st_transform(crs = st_crs(baltimore_tracts))%&gt;%
-  st_join(baltimore_tracts)%&gt;%
-  group_by(GEOID)%&gt;%
-  tally()%&gt;%
-  st_drop_geometry()%&gt;%
-  rename(tractbids = n)</code></pre>
-<pre><code>## Reading layer `OGRGeoJSON&#39; from data source 
-##   `https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&amp;where=1%3D1&amp;f=geojson&#39; 
-##   using driver `GeoJSON&#39;
-## Simple feature collection with 1205 features and 10 fields
-## Geometry type: POINT
-## Dimension:     XY
-## Bounding box:  xmin: -76.68734 ymin: 39.23272 xmax: -76.55044 ymax: 39.37046
-## Geodetic CRS:  WGS 84</code></pre>
-<pre class="r"><code>#Universities &amp; colleges? 
-bmore_colleges &lt;- st_read(&quot;https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Universities_and_Colleges/FeatureServer/0/query?outFields=*&amp;where=1%3D1&amp;f=geojson&quot;)%&gt;%
-  st_transform(crs = st_crs(baltimore_tracts))</code></pre>
-<pre><code>## Reading layer `OGRGeoJSON&#39; from data source 
-##   `https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Universities_and_Colleges/FeatureServer/0/query?outFields=*&amp;where=1%3D1&amp;f=geojson&#39; 
-##   using driver `GeoJSON&#39;
-## Simple feature collection with 15 features and 5 fields
-## Geometry type: POINT
-## Dimension:     XY
-## Bounding box:  xmin: -76.68769 ymin: 39.26072 xmax: -76.58476 ymax: 39.35473
-## Geodetic CRS:  WGS 84</code></pre>
-<pre class="r"><code>#Businesses by community statistical areas 
-bmore_business &lt;- st_read(&quot;https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiind/FeatureServer/0/query?outFields=*&amp;where=1%3D1&amp;f=geojson&quot;)%&gt;%
-  mutate(changebiz = neiind19 - neiind10)%&gt;%
-  select(CSA2010, neiind21, geometry, changebiz) %&gt;%
-  rename(CSA = CSA2010, 
-         business_count = neiind21)</code></pre>
-<pre><code>## Reading layer `OGRGeoJSON&#39; from data source 
-##   `https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiind/FeatureServer/0/query?outFields=*&amp;where=1%3D1&amp;f=geojson&#39; 
-##   using driver `GeoJSON&#39;
-## Simple feature collection with 55 features and 17 fields
-## Geometry type: MULTIPOLYGON
-## Dimension:     XY
-## Bounding box:  xmin: -76.71141 ymin: 39.19724 xmax: -76.52968 ymax: 39.37201
-## Geodetic CRS:  WGS 84</code></pre>
-<pre class="r"><code>#Percentage of vacant lots 
-bmore_p_lots &lt;- st_read(&quot;https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&amp;where=1%3D1&amp;f=geojson&quot;) %&gt;%
-  select(CSA2020, vacant21, geometry) %&gt;%
-  rename(CSA = CSA2020, 
-         p_vacant = vacant21)</code></pre>
-<pre><code>## Reading layer `OGRGeoJSON&#39; from data source 
-##   `https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer/0/query?outFields=*&amp;where=1%3D1&amp;f=geojson&#39; 
-##   using driver `GeoJSON&#39;
-## Simple feature collection with 55 features and 17 fields
-## Geometry type: MULTIPOLYGON
-## Dimension:     XY
-## Bounding box:  xmin: -76.71141 ymin: 39.19724 xmax: -76.52968 ymax: 39.37201
-## Geodetic CRS:  WGS 84</code></pre>
-<pre class="r"><code>#Baltimore schools
-school_outcome &lt;- st_read(&quot;https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&amp;where=1%3D1&amp;f=geojson&quot;)%&gt;%
-  select(CSA2010, pread317, geometry) %&gt;%
-  rename(CSA = CSA2010,
-         p_students = pread317)%&gt;%
-  st_centroid()</code></pre>
-<pre><code>## Reading layer `OGRGeoJSON&#39; from data source 
-##   `https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer/0/query?outFields=*&amp;where=1%3D1&amp;f=geojson&#39; 
-##   using driver `GeoJSON&#39;
-## Simple feature collection with 55 features and 7 fields
-## Geometry type: MULTIPOLYGON
-## Dimension:     XY
-## Bounding box:  xmin: -76.71141 ymin: 39.19724 xmax: -76.52968 ymax: 39.37201
-## Geodetic CRS:  WGS 84</code></pre>
-<pre class="r"><code>#walk score
-walk_score &lt;- st_read(&quot;https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wlksc/FeatureServer/0/query?outFields=*&amp;where=1%3D1&amp;f=geojson&quot;)%&gt;%
-  mutate(changewalk = wlksc17 - wlksc11)%&gt;%
-  select(CSA2010, wlksc17, geometry, changewalk) %&gt;%
-  rename(CSA = CSA2010,
-         walk_score = wlksc17)%&gt;%
-  st_centroid()</code></pre>
-<pre><code>## Reading layer `OGRGeoJSON&#39; from data source 
-##   `https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wlksc/FeatureServer/0/query?outFields=*&amp;where=1%3D1&amp;f=geojson&#39; 
-##   using driver `GeoJSON&#39;
-## Simple feature collection with 55 features and 6 fields
-## Geometry type: MULTIPOLYGON
-## Dimension:     XY
-## Bounding box:  xmin: -76.71141 ymin: 39.19724 xmax: -76.52968 ymax: 39.37201
-## Geodetic CRS:  WGS 84</code></pre>
-<pre class="r"><code>walk_score_csa &lt;- walk_score %&gt;%
-  st_drop_geometry()
-walk_score_csa &lt;- left_join(bmorecsa, walk_score_csa, by = c(&quot;Community&quot; = &quot;CSA&quot;))
-
-#crime
-crime &lt;- st_read(&quot;https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Part1_Crime_Beta/FeatureServer/0/query?where=1%3D1&amp;outFields=CrimeCode,Description,Weapon,Post,Location,Latitude,Longitude,GeoLocation,Total_Incidents,CCNumber,CrimeDateTime&amp;outSR=4326&amp;f=json&quot;)</code></pre>
-<pre><code>## Reading layer `ESRIJSON&#39; from data source 
-##   `https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Part1_Crime_Beta/FeatureServer/0/query?where=1%3D1&amp;outFields=CrimeCode,Description,Weapon,Post,Location,Latitude,Longitude,GeoLocation,Total_Incidents,CCNumber,CrimeDateTime&amp;outSR=4326&amp;f=json&#39; 
-##   using driver `ESRIJSON&#39;
-## replacing null geometries with empty geometries
-## Simple feature collection with 616077 features and 11 fields (with 1063 geometries empty)
-## Geometry type: POINT
-## Dimension:     XY
-## Bounding box:  xmin: -76.7113 ymin: 5.684342e-14 xmax: 5.684342e-14 ymax: 39.37209
-## Geodetic CRS:  WGS 84</code></pre>
 <pre class="r"><code>#change in walk score
 ggplot() +
   geom_sf(data = water_bound, fill = &quot;steelblue&quot;) +
