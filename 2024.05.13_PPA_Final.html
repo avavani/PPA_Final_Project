@@ -1741,26 +1741,30 @@ model. Our data sources primarily included the 2012 and 2022 5-year ACS
 (American Community Survey) from the U.S. Census Bureau and Open
 Baltimore (<a href="https://data.baltimorecity.gov/" class="uri">https://data.baltimorecity.gov/</a>).</p>
 <p>The specific features pulled based on this criteria were:</p>
-<p><em>Baltimore City Open Bid List</em> The Baltimore Bids feature
-includes the count of city owned vacant lots and properties with vacant
-building notices.</p>
-<p><em>Universities and Colleges</em> The colleges feature includes the
-locations of universities and colleges in Baltimore.</p>
-<p><em>Businesses</em> The businesses feature contains the count of
-businesses in each community statistical area (CSA), which is a
-geographic measurement developed by the Baltimore City Planning
-Department to define neighborhood clusters. Ths model also includes a
-change in businesses feature, which accounts for the change in count of
-businesses per CSA from 2010 to 2019.</p>
-<p><em>Vacant Lots</em> The vacant lots feature includes the percentage
-of residential properties which have been classifies as vacant or
-abandoned by the City of Baltimore per CSA.</p>
-<p><em>Baltimore Schools</em> The schools feature highlights the
-percentage of students per CSA who exceeded or met the Partnership for
-Assessment of Readiness for College and Careers (PARCC) math
-expectations.</p>
-<p><em>Walk Score</em> The walk score feature includes the average walk
-score by CSA and the change in walk score from 2017 to 2011.</p>
+<p><em>Baltimore City Open Bid List</em></p>
+<p>The Baltimore Bids feature includes the count of city owned vacant
+lots and properties with vacant building notices.</p>
+<p><em>Universities and Colleges</em></p>
+<p>The colleges feature includes the locations of universities and
+colleges in Baltimore.</p>
+<p><em>Businesses</em></p>
+<p>The businesses feature contains the count of businesses in each
+community statistical area (CSA), which is a geographic measurement
+developed by the Baltimore City Planning Department to define
+neighborhood clusters. Ths model also includes a change in businesses
+feature, which accounts for the change in count of businesses per CSA
+from 2010 to 2019.</p>
+<p><em>Vacant Lots</em></p>
+<p>The vacant lots feature includes the percentage of residential
+properties which have been classifies as vacant or abandoned by the City
+of Baltimore per CSA.</p>
+<p><em>Baltimore Schools</em></p>
+<p>The schools feature highlights the percentage of students per CSA who
+exceeded or met the Partnership for Assessment of Readiness for College
+and Careers (PARCC) math expectations.</p>
+<p><em>Walk Score</em></p>
+<p>The walk score feature includes the average walk score by CSA and the
+change in walk score from 2017 to 2011.</p>
 <pre class="r"><code>#change in walk score
 ggplot() +
   geom_sf(data = water_bound, fill = &quot;steelblue&quot;) +
@@ -2008,9 +2012,9 @@ identifying non-gentrification over gentrification.</p>
 <div id="model-performance" class="section level2">
 <h2>Model Performance</h2>
 <p>Overall, our model performs well in terms of predicting
-gentrificiation. Though the model is limited by the lack of
-observations, the ROC curve still has an AUC value of 0.761,
-underscoring that the model performs well across all thresholds.</p>
+gentrification. Though the model is limited by the lack of observations,
+the ROC curve still has an AUC value of 0.761, underscoring that the
+model performs well across all thresholds.</p>
 <p>The threshold performance curve further provides insights into the
 model’s behavior. As shown in graph below, the accuracy, true positive
 rate (TPR), and false positive rate (FPR) vary with percentile cut off
