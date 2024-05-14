@@ -756,7 +756,6 @@ select(-p_students,
 -business_count,
 -changewalk)
 
-set.seed(777)
 
 train <- all.acs.reg %>%
   sample_frac(.75)
