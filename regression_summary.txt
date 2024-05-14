@@ -5,40 +5,39 @@ Regression Results
                           -----------------------------
                                     gentrify           
 -------------------------------------------------------
-TotalPopulation17            -0.0002 (-0.001, 0.001)   
-TotalHousingUnits17          -0.0004 (-0.003, 0.002)   
-MovedWithinCounty17          0.0001 (-0.004, 0.004)    
-MovedFromSameState17         -0.005 (-0.012, 0.001)    
-MovedFromDifferentState17    -0.010 (-0.022, 0.001)    
-BachelorsDegree17             0.002 (-0.002, 0.005)    
-PopChangePct                 -0.048 (-0.121, 0.024)    
-HUnitsPctChange               0.109* (0.024, 0.195)    
-VacantUnitsPctChange          0.001 (-0.014, 0.016)    
-IncPctChange                  0.017 (-0.001, 0.036)    
-WhiteAlonePctChange          0.0003 (-0.001, 0.002)    
-GradPctChange                 0.002 (-0.001, 0.004)    
-CountyWWMovePctChange        -0.002 (-0.011, 0.008)    
-SStateMovePctChange          0.0005 (-0.0003, 0.001)   
-DiffStateMovePctChange       0.0003 (-0.001, 0.002)    
-AbroadMovePctChange          -0.0003 (-0.001, 0.001)   
-BachelorsPctChange            0.001 (-0.006, 0.008)    
-OOSizePctChange               0.034 (-0.007, 0.075)    
-ROSizePctChange               0.040* (0.004, 0.076)    
-FamHHPctChange               -0.015 (-0.053, 0.023)    
-NonFamHHPctChange            -0.005 (-0.036, 0.025)    
-p_vacant                     -0.007 (-0.085, 0.071)    
-business_count               -0.002 (-0.005, 0.001)    
-changebiz                    -0.0005 (-0.006, 0.005)   
-p_students                   -0.032 (-0.078, 0.015)    
-walk_score                    0.016 (-0.007, 0.038)    
-changewalk                    0.006 (-0.127, 0.138)    
-collegedist                 -0.0002 (-0.001, 0.0003)   
-tractbids                    -0.006 (-0.048, 0.037)    
-Constant                      0.363 (-1.671, 2.398)    
+TotalPopulation17            0.001 (-0.0002, 0.002)    
+TotalHousingUnits17          -0.001 (-0.003, 0.002)    
+VacantHousingUnits17         -0.004 (-0.010, 0.002)    
+MovedWithinCounty17          -0.005 (-0.014, 0.004)    
+MovedFromSameState17         -0.004 (-0.011, 0.002)    
+MovedFromDifferentState17    -0.006 (-0.017, 0.005)    
+PopChangePct                 -0.003 (-0.065, 0.059)    
+HUnitsPctChange               0.109* (0.022, 0.196)    
+IncPctChange                  0.030* (0.007, 0.053)    
+GradPct17                    -0.025 (-0.139, 0.090)    
+CountyWWMovePct17             0.230 (-0.022, 0.481)    
+WhiteAlonePctChange           0.001 (-0.001, 0.002)    
+GradPctChange                0.002 (-0.0005, 0.004)    
+CountyWWMovePctChange         0.003 (-0.007, 0.013)    
+SStateMovePctChange          0.0002 (-0.001, 0.001)    
+DiffStateMovePctChange        0.002 (-0.002, 0.006)    
+AbroadMovePctChange          0.0001 (-0.003, 0.003)    
+BachelorsPctChange            0.004 (-0.003, 0.012)    
+OOSizePctChange               0.024 (-0.016, 0.063)    
+ROSizePctChange               0.028 (-0.006, 0.063)    
+FamHHPctChange               -0.011 (-0.032, 0.010)    
+NonFamHHPctChange            -0.017 (-0.048, 0.014)    
+p_vacant                      0.107 (-0.017, 0.230)    
+changewalk                  -0.202* (-0.362, -0.042)   
+collegedist                  0.0001 (-0.0005, 0.001)   
+tractbids                    -0.028 (-0.087, 0.030)    
+walk_school                  -0.0002 (-0.001, 0.001)   
+business2                   -0.0001 (-0.0002, 0.0001)  
+Constant                     -2.231 (-5.489, 1.026)    
 -------------------------------------------------------
-Observations                           176             
-Log Likelihood                       -68.285           
-Akaike Inf. Crit.                    196.570           
+Observations                           149             
+Log Likelihood                       -59.427           
+Akaike Inf. Crit.                    176.855           
 =======================================================
 Significance levels:      *p<0.05; **p<0.01; ***p<0.001
                           *** p<0.001                  
