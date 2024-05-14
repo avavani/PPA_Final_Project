@@ -312,6 +312,10 @@ ggplot() +
 
 ```
 
+:::
+
+::: {}
+
 ```{r bmorevis_mapcol2, echo=FALSE, message=FALSE, warning=FALSE}
 
 #2022 Majority Non-White
@@ -372,6 +376,9 @@ ggplot() +
 
 ```
 
+:::
+
+::::
 
 Baltimore is less than an hour North of Annapolis, MD (the state capital) and Washington, DC as the crow drives. Baltimore/Washington International Airport (BWI) does not lie within Baltimore City boundaries.
 
@@ -577,6 +584,9 @@ walk_score_csa <- walk_score %>%
 walk_score_csa <- left_join(bmorecsa, walk_score_csa, by = c("Community" = "CSA"))
 ```
 
+:::: {style="display: flex;"}
+
+::: {}
 
 ```{r feature_mapcol1, message=FALSE, warning=FALSE}
 
@@ -623,6 +633,9 @@ ggplot() +
 
 ```
 
+:::
+
+::: {}
 
 ```{r feature_mapcol2, message=FALSE, warning=FALSE}
 
@@ -666,6 +679,9 @@ ggplot() +
 
 ```
 
+:::
+
+::::
 
 ## Logistic Regression
 
