@@ -35,6 +35,8 @@ water_bound <- st_as_sfc(st_bbox(md_bound), crs = "EPSG:4269")
 
 patapsco <- st_read("https://gisdata.baltimorecity.gov/egis/rest/services/OpenBaltimore/Water/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
 
+bmorecsa <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Community_Statistical_Areas_(CSAs)__Reference_Boundaries/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+
 ```
 
 ```{r callingacsdata, include=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
@@ -565,6 +567,10 @@ walk_score <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest
          walk_score = wlksc17)%>%
   st_centroid()
 
+walk_score_csa <- walk_score %>%
+  st_drop_geometry()
+walk_score_csa <- left_join(bmorecsa, walk_score_csa, by = c("Community" = "CSA"))
+
 #crime
 crime <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Part1_Crime_Beta/FeatureServer/0/query?where=1%3D1&outFields=CrimeCode,Description,Weapon,Post,Location,Latitude,Longitude,GeoLocation,Total_Incidents,CCNumber,CrimeDateTime&outSR=4326&f=json")
   
@@ -577,9 +583,9 @@ crime <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/serv
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = walkscore, fill = "gray70", col = "gray60") +
+  geom_sf(data = bmore_CSA_data, fill = "gray70", col = "gray60") +
   geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
-  geom_sf(data = walk_score, aes(col = changewalk), size = 3) +
+  geom_sf(data = walk_score, aes(col = changewalk), size = 5, shape = 18) +
   scale_color_gradient(
     high = "#861D05",
     low = "#F5B5AC") +
