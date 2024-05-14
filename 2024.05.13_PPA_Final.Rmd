@@ -893,9 +893,9 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
 ```
 The threshold performance curve further provides insights into the model's behavior. As shown in graph below, the accuracy, true positive rate (TPR), and false positive rate (FPR) vary with percentile cut off threshold use for creating our binary gentrification variable.
 
-At lower percentiles, the model is more likely to classify tracts as gentrifying, which increases the TPR but also leads to a higher FPR. This indicates that while the model captures more tracts that do gentrify, it also generates more false positives. As the threshold increases, the TPR decreases while the FPR also decreases, meaning the model becomes more conservative in predicting gentrification, thus reducing the number of false positives but also missing some true positives.
+At lower percentiles, the model is more likely to classify tracts as gentrifying, which increases the TPR but also leads to a higher FPR. This indicates that while the model captures more tracts that do gentrify, it also generates more false positives. As the percentile increases, the TPR decreases while the FPR also decreases, meaning the model becomes more conservative in predicting gentrification, thus reducing the number of false positives but also missing some true positives.
 
-For the purposes of this project, we focused on minimizing false positives, which led to our high cutoff threshold. However, in the future, this threshold can be adjusted to meet different objectives. For instance, our current model, with its high cutoff, is suitable for private developers looking to invest in gentrifying neighborhoods. Conversely, if the model were to be used by a government agency to plan for rental assistance, the cutoff threshold would need to be lowered to reduce the risk of missing areas that might benefit from such programs.
+For the purposes of this project, we focused on minimizing false positives, which led to our high cutoff percentile of 75%. However, in the future, this threshold can be adjusted to meet different objectives. For instance, our current model, with its high cutoff, is suitable for private developers looking to avoid investment in non-gentrifying neighborhoods. Conversely, if the model were to be used by a government agency to plan for rental assistance, the cutoff threshold would need to be lowered to reduce the risk of missing areas that might benefit from such programs.
 
 ```{r thresholds, warning=FALSE, message=FALSE}
 ggplot(testProbs.thresholds, aes(x = Threshold)) +
@@ -916,7 +916,7 @@ ggplot(testProbs.thresholds, aes(x = Threshold)) +
 
 # Cross Validation
 
-Overall, our model shows strong generalizability in predicting gentrification across different geographic regions. Running a Spatial Cross Validation finds our MAE to be 0.417, showing relative robustness across the different census tracts.
+Overall, our model shows strong generalizability in predicting gentrification across different geographic regions. Running a Spatial Cross Validation finds our MAE to be 0.417, showing relative robustness across the different census tracts. This MAE is achieved after running k-fold spatial cross validation across all census tracts in the neighborhood, highlighting that overall, our model is relatively generalizable across space.
 
 ```{r spatialcrossval, message=FALSE, warning=FALSE, include=FALSE}
 acs.cv <- acs.hoods
@@ -940,7 +940,6 @@ reg.vars <- c("TotalPopulation17", "TotalHousingUnits17",
                       "p_vacant", "tractbids", "walk_school",
                       "business2", "upcoming")
 
-p_load(kableExtra)
 reg.spatialCV <- crossValidate(
   dataset = acs.cv,
   id = "GEOID",
@@ -993,7 +992,8 @@ ggplot() +
        subtitle = "Baltimore City, MD")
 
 ```
-Interestingly, some of the tracts with the highest MAE are also the tracts with the strongest predicted Gentrification Index, once again highlighting our model's weakness when it comes to true positives.
+
+Interestingly, some of the tracts with the highest MAE are also the tracts with the strongest predicted Gentrification Index, despite not being classified as gentrified by our threshold. These tracts generally seem to be neighboring actually gentrifying tracts. This discrepancy may be due to hidden spatial autocorrelation—tracts near other gentrifying tracts may experience similar forces, though not at the same scale. This spatial spillover effect suggests that while these tracts do not meet the gentrification threshold, they are influenced by nearby gentrification activities, which our model captures. In the future, we would be interested in accounting for these spatial autocorrelations.
 
 
 # Conclusion
