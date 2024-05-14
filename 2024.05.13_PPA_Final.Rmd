@@ -477,20 +477,23 @@ all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")%>%
 
 ```{r gentrification_map, warning=FALSE, message=FALSE}
 
+all.acs.sf.g <- all.acs.sf %>%
+  dplyr::select(GEOID, gentrify) %>%
+  mutate(gentrify = as.factor(gentrify))
+
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
-  geom_sf(data = all.acs.sf, aes(fill = gentrify), col = "#756059") +
-  scale_fill_gradient(
-    high = "#F56A40",
-    low = "#5FA08F") +
+  geom_sf(data = all.acs.sf, aes(fill = as.factor(gentrify)), col = "#756059") +
+  scale_fill_manual(values = c("#5FA08F", "#F56A40"),
+                    labels = c("No", "Yes")) +
   geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
   theme_void() +
   xlim(-76.75, -76.48) +
   ylim(39.2, 39.38) +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Gentrification",
-       title = "2022 Gentrified Census Tracts",
+  labs(fill = "Gentrified?",
+       title = "2022 Gentrification per Census Tract",
        subtitle = "Baltimore City, MD")
 
 ```
