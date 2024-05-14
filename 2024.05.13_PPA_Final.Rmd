@@ -282,7 +282,8 @@ ggplot() +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
   labs(fill = "Median Household Income",
        title = "2022 Median Household Income",
-       subtitle = "Baltimore City, MD")
+       subtitle = "Baltimore City, MD", 
+       caption = "Source: 5-year ACS, U.S. Census Bureau")
 
 #2022 Median Home Value
 ggplot() +
@@ -300,7 +301,8 @@ ggplot() +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
   labs(fill = "Median Home Value",
        title = "2022 Median Home Value",
-       subtitle = "Baltimore City, MD")
+       subtitle = "Baltimore City, MD", 
+       caption = "Source: 5-year ACS, U.S. Census Bureau")
 
 ```
 
@@ -322,7 +324,8 @@ ggplot() +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
   labs(fill = "Percent Non-White",
        title = "2022 Race/Ethnicity",
-       subtitle = "Baltimore City, MD")
+       subtitle = "Baltimore City, MD", 
+       caption = "Source: 5-year ACS, U.S. Census Bureau")
 
 #2022 Median Rent
 ggplot() +
@@ -340,7 +343,8 @@ ggplot() +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
   labs(fill = "Median Gross Rent",
        title = "2022 Median Gross Rent",
-       subtitle = "Baltimore City, MD")
+       subtitle = "Baltimore City, MD", 
+       caption = "Source: 5-year ACS, U.S. Census Bureau")
 
 #2022 Majority Owner
 # ggplot() +
@@ -491,7 +495,7 @@ For testing the ability to predict gentrification, input features that could be 
 The specific features pulled based on this criteria were:
 
 _Baltimore City Open Bid List_
-The Baltimore Bids feature includes city owned vacant lots and properties with vacant building notices. 
+The Baltimore Bids feature includes the count of city owned vacant lots and properties with vacant building notices. 
 
 _Universities and Colleges_ 
 The colleges feature includes the locations of universities and colleges in Baltimore. 
@@ -500,7 +504,7 @@ _Businesses_
 The businesses feature contains the count of businesses in each community statistical area (CSA), which is a geographic measurement developed by the Baltimore City Planning Department to define neighborhood clusters. Ths model also includes a change in businesses feature, which accounts for the change in count of businesses per CSA from 2010 to 2019. 
 
 _Vacant Lots_ 
-The vacant lots feature includes the percentage of vacant lots per CSA. 
+The vacant lots feature includes the percentage of residential properties which have been classifies as vacant or abandoned by the City of Baltimore per CSA. 
 
 _Baltimore Schools_ 
 The schools feature highlights the percentage of students per CSA who exceeded or met the Partnership for Assessment of Readiness for College and Careers (PARCC) math expectations. 
@@ -573,7 +577,8 @@ ggplot() +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
   labs(fill = "Change in Walk Score",
        title = "2011 to 2017 Change in Walk Score",
-       subtitle = "Baltimore City, MD")
+       subtitle = "Baltimore City, MD", 
+       caption = "Source: Walk Score")
 
 #percent change in housing units
 huchange <- all.acs.sf %>%
@@ -595,7 +600,8 @@ ggplot() +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
   labs(fill = "Percent Change",
        title = "2017 to 2022 Percent Change in Number of Housing Units",
-       subtitle = "Baltimore City, MD")
+       subtitle = "Baltimore City, MD", 
+       caption = "Source: 5-year ACS, U.S. Census Bureau")
 
 ```
 
@@ -607,22 +613,45 @@ ggplot() +
 ggplot() +
   geom_sf(data = water_bound, fill = "steelblue") +
   geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = huchange, fill = "gray60", col = "gray65") +
   geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
   geom_sf(data = bmore_colleges, col = "orange", fill = "orange4", shape = 25, size = 3, alpha = 0.8) +
   theme_void() +
   xlim(-76.75, -76.48) +
   ylim(39.2, 39.38) +
+  theme(legend.position = "none", legend.key.width = unit(1.5, "cm")) +
+  labs(title = "Colleges and Universities",
+       subtitle = "Baltimore City, MD", 
+       caption = "Source: Open Baltimore")
+
+#pcent vacant lots
+bmore_p_lots_sf <- bmore_p_lots %>%
+  dplyr::mutate(p_vacant = p_vacant/100)
+
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = bmore_p_lots_sf, aes(fill = p_vacant), col = "transparent") +
+  scale_fill_gradient(
+    high = "#0F4600",
+    low = "#67A87A", 
+    labels = scales::percent) +
+  geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Change in Walk Score",
-       title = "2011 to 2017 Change in Walk Score",
-       subtitle = "Baltimore City, MD")
+  labs(fill = "Vacancy Rate",
+       title = "2021 Vacancy Rate per CSA",
+       subtitle = "Baltimore City, MD", 
+       caption = "Source: Open Baltimore")
 
 ```
 
 
 ## Logistic Regression
 
-```{r additionalvar, include=false, warning=FALSE, message=FALSE}
+```{r additionalvar, message=FALSE, warning=FALSE, include=FALSE}
 p_load(nngeo,FNN,tibble, caret)
 
 bmore_hoods <- bmore_p_lots %>%
@@ -731,7 +760,6 @@ select(-p_students,
 -business_count,
 -changewalk)
 
-set.seed(777)
 
 train <- all.acs.reg %>%
   sample_frac(.75)
@@ -794,7 +822,7 @@ The higher peak to the left in the top chart indicates that the model is more co
 
 The more evenly distributed curve in the bottom chart suggests that the model's predicted probabilities for gentrification instances (class 1) are spread out across a wider range. The slight peak between 0.5 and 0.75 indicates that there are instances where the model predicts a moderate to high likelihood of gentrification, but with some variability.
 
-Overall, these patterns highlight that the model has greater confidence identifying non-gentrification over gentrification. 
+These patterns highlight that the model has greater confidence identifying non-gentrification over gentrification. 
 
 ## Model Performance
 
