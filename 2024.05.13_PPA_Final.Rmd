@@ -578,6 +578,10 @@ crime <- st_read("https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/serv
 
 ```
 
+::: {style="display: flex;"}
+
+::: {}
+
 ```{r feature_mapcol1, message=FALSE, warning=FALSE}
 
 #change in walk score
@@ -620,6 +624,20 @@ ggplot() +
        subtitle = "Baltimore City, MD")
 
 ```
+
+:::
+
+::: {}
+
+```{r feature_mapcol2, message=FALSE, warning=FALSE}
+
+
+
+```
+
+:::
+
+::::
 
 ## Joining additional metrics
 
