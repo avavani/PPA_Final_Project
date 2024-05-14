@@ -927,8 +927,28 @@ reg.spatialCV <- crossValidate(
 select(GEOID, gentrify, Prediction)%>%
 mutate(error = Prediction - gentrify)
 
-tm_shape(reg.spatialCV)+
-tm_polygons(col = "Prediction")
+#tm_shape(reg.spatialCV)+
+#tm_polygons(col = "Prediction")
+```
+
+```{r prediction_map, warning=FALSE, message=FALSE}
+
+ggplot() +
+  geom_sf(data = water_bound, fill = "steelblue") +
+  geom_sf(data = md_bound, fill = "gray80", col = "gray75") +
+  geom_sf(data = reg.spatialCV, aes(fill = Prediction), col = "transparent") +
+  scale_fill_gradient(
+    high = "#862805",
+    low = "#EC9D1F") +
+  geom_sf(data = patapsco, fill = "steelblue", col = "transparent") +
+  theme_void() +
+  xlim(-76.75, -76.48) +
+  ylim(39.2, 39.38) +
+  theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
+  labs(fill = "Gentrification Index",
+       title = "Predicted Gentrification Index",
+       subtitle = "Baltimore City, MD")
+
 ```
 
 

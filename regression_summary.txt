@@ -5,39 +5,39 @@ Regression Results
                           -----------------------------
                                     gentrify           
 -------------------------------------------------------
-TotalPopulation17            0.001 (-0.0005, 0.002)    
-TotalHousingUnits17          -0.001 (-0.003, 0.002)    
-VacantHousingUnits17         -0.0004 (-0.006, 0.005)   
-MovedWithinCounty17          -0.005 (-0.013, 0.004)    
-MovedFromSameState17         -0.006 (-0.013, 0.0003)   
-MovedFromDifferentState17    -0.004 (-0.013, 0.005)    
-PopChangePct                 -0.026 (-0.086, 0.035)    
-HUnitsPctChange              0.128** (0.042, 0.214)    
-IncPctChange                  0.015 (-0.006, 0.035)    
-GradPct17                    -0.019 (-0.115, 0.078)    
-CountyWWMovePct17             0.227 (-0.029, 0.483)    
-WhiteAlonePctChange         -0.00000 (-0.001, 0.001)   
+TotalPopulation17            -0.001 (-0.003, 0.001)    
+TotalHousingUnits17          -0.0002 (-0.003, 0.003)   
+VacantHousingUnits17         0.0004 (-0.006, 0.007)    
+MovedFromSameState17         -0.002 (-0.019, 0.016)    
+MovedFromDifferentState17    -0.005 (-0.016, 0.007)    
+FamilyHouseholds17            0.005 (-0.002, 0.012)    
+PopChangePct                 -0.033 (-0.095, 0.028)    
+HUnitsPctChange               0.105* (0.014, 0.196)    
+IncPctChange                  0.015 (-0.006, 0.036)    
+GradPct17                    -0.056 (-0.177, 0.064)    
+CountyWWMovePct17             0.086 (-0.040, 0.213)    
+SStateMovePct17              -0.087 (-0.679, 0.506)    
+BachelorsPct17                0.048 (-0.103, 0.198)    
+WhiteAlonePctChange           0.001 (-0.002, 0.003)    
 GradPctChange                 0.001 (-0.001, 0.003)    
-CountyWWMovePctChange         0.002 (-0.008, 0.013)    
-SStateMovePctChange          0.0003 (-0.001, 0.001)    
-DiffStateMovePctChange       0.0001 (-0.002, 0.002)    
-AbroadMovePctChange           0.001 (-0.002, 0.003)    
-BachelorsPctChange           -0.001 (-0.008, 0.006)    
-OOSizePctChange               0.033 (-0.006, 0.073)    
-ROSizePctChange               0.031 (-0.005, 0.066)    
-FamHHPctChange               -0.023 (-0.058, 0.012)    
-NonFamHHPctChange            -0.014 (-0.044, 0.015)    
-p_vacant                      0.038 (-0.059, 0.135)    
-changewalk                   -0.044 (-0.177, 0.089)    
-collegedist                 0.00003 (-0.0005, 0.001)   
-tractbids                    -0.016 (-0.067, 0.036)    
+CountyWWMovePctChange         0.006 (-0.006, 0.017)    
+DiffStateMovePctChange       0.002* (0.0001, 0.005)    
+AbroadMovePctChange          -0.0001 (-0.001, 0.001)   
+BachelorsPctChange            0.005 (-0.005, 0.015)    
+OOSizePctChange               0.049* (0.009, 0.089)    
+ROSizePctChange               0.013 (-0.019, 0.045)    
+FamHHPctChange               -0.008 (-0.032, 0.015)    
+NonFamHHPctChange            -0.026 (-0.060, 0.008)    
+p_vacant                      0.043 (-0.088, 0.174)    
+tractbids                    -0.070 (-0.154, 0.014)    
 walk_school                  -0.0001 (-0.001, 0.001)   
-business2                  -0.00002 (-0.0001, 0.0001)  
-Constant                     -1.942 (-4.969, 1.086)    
+business2                 -0.00000 (-0.00001, 0.00000) 
+upcoming                    -0.044* (-0.083, -0.004)   
+Constant                     -0.345 (-2.870, 2.180)    
 -------------------------------------------------------
 Observations                           149             
-Log Likelihood                       -63.923           
-Akaike Inf. Crit.                    185.846           
+Log Likelihood                       -60.930           
+Akaike Inf. Crit.                    179.860           
 =======================================================
 Significance levels:      *p<0.05; **p<0.01; ***p<0.001
                           *** p<0.001                  
