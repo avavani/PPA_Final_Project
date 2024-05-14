@@ -1,42 +1,45 @@
 
 Regression Results
-====================================================
-                            Dependent variable:     
-                       -----------------------------
-                                 gentrify           
-----------------------------------------------------
-PopChangePct              -0.022 (-0.086, 0.042)    
-HUnitsPctChange           0.137** (0.038, 0.236)    
-VacantUnitsPctChange      -0.004 (-0.018, 0.010)    
-IncPctChange               0.011 (-0.007, 0.030)    
-WhiteAlonePctChange       0.0002 (-0.001, 0.002)    
-GradPctChange             0.002 (-0.0002, 0.004)    
-CountyWWMovePctChange     -0.001 (-0.010, 0.009)    
-SStateMovePctChange       0.0003 (-0.0005, 0.001)   
-DiffStateMovePctChange    -0.0004 (-0.002, 0.001)   
-AbroadMovePctChange       -0.0002 (-0.003, 0.002)   
-BachelorsPctChange         0.001 (-0.005, 0.007)    
-OOSizePctChange            0.025 (-0.012, 0.063)    
-ROSizePctChange            0.020 (-0.014, 0.055)    
-FamHHPctChange            -0.032 (-0.075, 0.012)    
-NonFamHHPctChange         -0.026 (-0.060, 0.008)    
-p_vacant                   0.050 (-0.029, 0.129)    
-business_count            -0.002 (-0.005, 0.0004)   
-changebiz                  0.005 (-0.009, 0.018)    
-p_students                 0.048 (-0.041, 0.136)    
-walk_score                 0.032 (-0.007, 0.071)    
-changewalk                -0.068 (-0.204, 0.067)    
-collegedist               0.0003 (-0.0002, 0.001)   
-tractbids                 -0.018 (-0.066, 0.029)    
-walk_school               -0.001 (-0.002, 0.001)    
-business2              -0.00000 (-0.00001, 0.00000) 
-Constant                 -2.944* (-5.729, -0.159)   
-----------------------------------------------------
-Observations                        149             
-Log Likelihood                    -68.786           
-Akaike Inf. Crit.                 189.571           
-====================================================
-Significance levels:   *p<0.05; **p<0.01; ***p<0.001
-                       *** p<0.001                  
-                       ** p<0.01                    
-                       * p<0.05                     
+=======================================================
+                               Dependent variable:     
+                          -----------------------------
+                                    gentrify           
+-------------------------------------------------------
+TotalPopulation17            0.001 (-0.0005, 0.002)    
+TotalHousingUnits17          -0.001 (-0.003, 0.002)    
+VacantHousingUnits17         -0.0004 (-0.006, 0.005)   
+MovedWithinCounty17          -0.005 (-0.013, 0.004)    
+MovedFromSameState17         -0.006 (-0.013, 0.0003)   
+MovedFromDifferentState17    -0.004 (-0.013, 0.005)    
+PopChangePct                 -0.026 (-0.086, 0.035)    
+HUnitsPctChange              0.128** (0.042, 0.214)    
+IncPctChange                  0.015 (-0.006, 0.035)    
+GradPct17                    -0.019 (-0.115, 0.078)    
+CountyWWMovePct17             0.227 (-0.029, 0.483)    
+WhiteAlonePctChange         -0.00000 (-0.001, 0.001)   
+GradPctChange                 0.001 (-0.001, 0.003)    
+CountyWWMovePctChange         0.002 (-0.008, 0.013)    
+SStateMovePctChange          0.0003 (-0.001, 0.001)    
+DiffStateMovePctChange       0.0001 (-0.002, 0.002)    
+AbroadMovePctChange           0.001 (-0.002, 0.003)    
+BachelorsPctChange           -0.001 (-0.008, 0.006)    
+OOSizePctChange               0.033 (-0.006, 0.073)    
+ROSizePctChange               0.031 (-0.005, 0.066)    
+FamHHPctChange               -0.023 (-0.058, 0.012)    
+NonFamHHPctChange            -0.014 (-0.044, 0.015)    
+p_vacant                      0.038 (-0.059, 0.135)    
+changewalk                   -0.044 (-0.177, 0.089)    
+collegedist                 0.00003 (-0.0005, 0.001)   
+tractbids                    -0.016 (-0.067, 0.036)    
+walk_school                  -0.0001 (-0.001, 0.001)   
+business2                  -0.00002 (-0.0001, 0.0001)  
+Constant                     -1.942 (-4.969, 1.086)    
+-------------------------------------------------------
+Observations                           149             
+Log Likelihood                       -63.923           
+Akaike Inf. Crit.                    185.846           
+=======================================================
+Significance levels:      *p<0.05; **p<0.01; ***p<0.001
+                          *** p<0.001                  
+                          ** p<0.01                    
+                          * p<0.05                     
