@@ -387,13 +387,15 @@ Baltimore is less than an hour North of Annapolis, MD (the state capital) and Wa
 
 Gentrification has many different definitions and connotations. At least part of its definition is intangible: often one can simply "feel" when a neighborhood has gentrified. At a glance, the clues may be found in the presence of new construction trying especially hard to look older, or in the manifestation of high-priced coffee shops and their hipster patrons where there were none before. 
 
-Because We define our Gentrification Index per CT as follows:
+The United States Department of Housing and Urban Development defines gentrification as, "a form of neighborhood change that occurs when high-income groups move to low-income areas, potentially altering the cultural and financial landscape of the original neighborhood”. 
 
-<center> GI = (∆ Low Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value) </center>
+Using this standard as a guide, we define our Gentrification Index per CT as follows:
 
-The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification.
+<center> GI = (∆ High Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value) </center>
 
-We assume that if rent has increased between 2012 and 2022, that it will continue to increase, magnifying the gentrification of an area.
+The change is calculated by subtracting the 2012 values from the 2022 values. The proportion of High Income residents per Census Tract is determined by tabulating the number of residents who make more than 80% of the AMI in Baltimore City alone during each given year. The change in Rent and Home Value were calculated based on median costs adjusted for inflation.
+
+Once sorted in order of their Gentrification Index, we determine that the top 30th percentile of Census Tracts are extreme enough in their exhibition of the Index's ingredients to be labeled as "gentrified."
 
 ```{r callingincomedata, warning=FALSE, message=FALSE}
 #Getting population by Income numbers
