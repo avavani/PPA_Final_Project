@@ -911,7 +911,7 @@ mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
 ```
 # Cross Validation
 
-```{r spatialcrossval, warning=FALSE, message=FALSE}
+```{r spatialcrossval, message=FALSE, warning=FALSE, include=FALSE}
 acs.cv <- acs.hoods %>%
 left_join(baltimore_tracts)%>%
   mutate(across(where(is.numeric), ~replace_na(., 0)),
