@@ -780,7 +780,7 @@ stargazer(reg.gentrify, type = "text", out = "regression_summary.txt", title = "
 
 Testing the outcomes.
 
-```{r confusionmatrix, warning=FALSE, message=FALSE}
+```{r confusionmatrix, warning=FALSE, message=FALSE, include=FALSE}
 testProbs <- 
   data.frame(class = test$gentrify,
              probs = predict(reg.gentrify, test, type = "response"))
@@ -792,7 +792,9 @@ testProbs %>%
   { caret::confusionMatrix(.$predClass, .$class, positive = "1") }
 ```
 
-More stuff
+Overall our model had accuracy of... and sensitivity of ....
+
+This distinction between sensitivity and specificity is further illustrated by the probability distribution graph below. Here, we see that our model's predictions are concentrated around 0 for tracts with no gentrification. However, its predictions for tracts with gentrification are more spread out, signifying its lack of reliability in identifying true positives.
 
 ```{r probdist, warning=FALSE, message=FALSE}
 p_load(ggplot2)
@@ -864,8 +866,8 @@ ggplot(testProbs.thresholds, aes(x = Threshold)) +
   geom_line(aes(y = Rate_TP, color = "True Positive Rate")) +
   geom_line(aes(y = Rate_FP, color = "False Positive Rate")) +
   scale_color_manual(values = c("Accuracy" = "blue", "True Positive Rate" = "green", "False Positive Rate" = "red")) +
-  labs(title = "Model Performance Across Different Thresholds",
-       x = "Threshold", y = "Rate") +
+  labs(title = "Model Performance Across Different Percentile Cutoffs",
+       x = "Percentile", y = "Rate") +
   theme_minimal() +
   theme(legend.title = element_blank(),
         legend.position = "bottom",
