@@ -42,15 +42,6 @@ bmorecsa <- st_read("https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/s
 ```
 
 ```{r callingacsdata, include=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
-#Getting my ACS Variable List
-acs_variable_list.2012 <- load_variables(2012, 
-                                         "acs5", 
-                                         cache = TRUE)
-
-acs_variable_list.2022 <- load_variables(2022, 
-                                         "acs5", 
-                                         cache = TRUE)
-
 #Picking out my variables of interest
 acs_vars <- c("B01001_001E",# ACS total Pop estimate
           "B25002_001E",# Estimate of total housing units
@@ -477,9 +468,6 @@ mutate(gentrify = case_when((genindex > (quantile(all.acs$genindex, 0.75, na.rm 
 baltimore_tracts <- tracts(state = "MD", county = "Baltimore City", year = 2022)
 all.acs.sf <- left_join(baltimore_tracts, all.acs, by = "GEOID")%>%
   st_as_sf()
-
-#tm_shape(all.acs.sf) +
-#  tm_polygons(col = "gentrify")
 ```
 
 ```{r gentrification_map, warning=FALSE, message=FALSE}
@@ -531,8 +519,6 @@ _Walk Score_
 The walk score feature includes the average walk score by CSA and the change in walk score from 2017 to 2011.
 
 ```{r bmore_data, message=FALSE, warning=FALSE, cache=TRUE, include=FALSE}
-
-
 #Open-Bid List - Vacants to Value 
 bmore_bids <- st_read("https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/7/query?outFields=*&where=1%3D1&f=geojson")%>%
   st_transform(crs = st_crs(baltimore_tracts))%>%
@@ -645,9 +631,9 @@ ggplot() +
 
 ::::
 
-## Joining additional metrics
+## Logistic Regression
 
-```{r, warning=FALSE, message=FALSE}
+```{r additionalvar, include=false, warning=FALSE, message=FALSE}
 p_load(nngeo,FNN,tibble, caret)
 
 bmore_hoods <- bmore_p_lots %>%
@@ -708,8 +694,8 @@ acs.hoods <- acs.hoods %>%
          across(where(is.character), ~replace_na(., "Unknown")))
 ```
 
-# Model Development & Testing
 
+To predict gentrification, we will utilize a logistic regression model.
 ```{r modelling, warning=FALSE, message=FALSE}
 set.seed(678)
 
@@ -784,8 +770,6 @@ The regression results reveal important insights into the factors influencing ge
 
 The model's accuracy of 0.78 indicates that it correctly predicts gentrification status approximately 78% of the time, showcasing its potential utility in identifying at-risk neighborhoods. The sensitivity (true positive rate) and specificity (true negative rate) are reasonably balanced at 0.6154 and 0.8378, meaning the model is slightly better than chance at identifying true positives. 
 
-Testing the outcomes.
-
 ```{r confusionmatrix, warning=FALSE, message=FALSE, include=FALSE}
 testProbs <- 
   data.frame(class = test$gentrify,
@@ -797,10 +781,6 @@ testProbs %>%
          class = factor(class, levels = c("0", "1"))) %>% 
   { caret::confusionMatrix(.$predClass, .$class, positive = "1") }
 ```
-
-Overall our model had accuracy of... and sensitivity of ....
-
-This distinction between sensitivity and specificity is further illustrated by the probability distribution graph below. Here, we see that our model's predictions are concentrated around 0 for tracts with no gentrification. However, its predictions for tracts with gentrification are more spread out, signifying its lack of reliability in identifying true positives.
 
 ```{r probdist, warning=FALSE, message=FALSE}
 p_load(ggplot2)
@@ -827,13 +807,36 @@ The more evenly distributed curve in the bottom chart suggests that the model's 
 
 Overall, these patterns highlight that the model has greater confidence identifying non-gentrification over gentrification. 
 
-# Validation
+## Model Performance
 
-More of the stuff. This time calling up a ROC curve.
+Overall, our model performs well in terms of predicting gentrificiation. Though the model is limited by the lack of observations, the ROC curve still has an AUC value of 0.761, underscoring that the model performs well across all thresholds.
 
-```{r ROCcurve, warning=FALSE, message=FALSE}
-p_load(pROC)
+```{r ROCcurve, message=FALSE, warning=FALSE, include=FALSE}
+p_load(gridExtra, pROC)
 
+aucTable <- testProbs %>% 
+  summarize(AUC = as.numeric(auc(roc(class, probs)))) %>% 
+  mutate(AUC = as.character(round(AUC, 3)))
+
+mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
+  ggplot(aes(Rate_FP, Rate_TP)) + 
+  geom_point(aes(shape = pointSize)) + geom_line() + scale_shape_identity() +
+  geom_abline(slope = 1, intercept = 0, size = 1.5, color = 'grey') +
+  annotation_custom(tableGrob(aucTable, rows = NULL), xmin = .45, xmax = 1, ymin = 0, ymax = .45) +
+  labs(title="ROC Curve", x="False Positive Rate", y="True Positive Rate") +
+  plotTheme()+
+  theme(text = element_text(family = "Times New Roman", size = 12), 
+        plot.title = element_text(face = "bold", size = 14),
+        plot.subtitle = element_text(size = 12),
+        plot.caption = element_text(size = 8))
+```
+The threshold performance curve further provides insights into the model's behavior. As shown in graph below, the accuracy, true positive rate (TPR), and false positive rate (FPR) vary with percentile cut off threshold use for creating our binary gentrification variable.
+
+At lower percentiles, the model is more likely to classify tracts as gentrifying, which increases the TPR but also leads to a higher FPR. This indicates that while the model captures more tracts that do gentrify, it also generates more false positives. As the threshold increases, the TPR decreases while the FPR also decreases, meaning the model becomes more conservative in predicting gentrification, thus reducing the number of false positives but also missing some true positives.
+
+For the purposes of this project, we focused on minimizing false positives, which led to our high cutoff threshold. However, in the future, this threshold can be adjusted to meet different objectives. For instance, our current model, with its high cutoff, is suitable for private developers looking to invest in gentrifying neighborhoods. Conversely, if the model were to be used by a government agency to plan for rental assistance, the cutoff threshold would need to be lowered to reduce the risk of missing areas that might benefit from such programs.
+
+```{r thresholds, warning=FALSE, message=FALSE}
 iterateThresholds <- function(data, observedClass, predictedProbs) {
   observedClass <- enquo(observedClass)
   predictedProbs <- enquo(predictedProbs)
@@ -888,29 +891,9 @@ ggplot(testProbs.thresholds, aes(x = Threshold)) +
         plot.caption = element_text(size = 8))
 ```
 
-ROC curve
-
-```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
-p_load(gridExtra)
-
-aucTable <- testProbs %>% 
-  summarize(AUC = as.numeric(auc(roc(class, probs)))) %>% 
-  mutate(AUC = as.character(round(AUC, 3)))
-
-mutate(testProbs.thresholds, pointSize = ifelse(Threshold == .48, 24, 16)) %>%
-  ggplot(aes(Rate_FP, Rate_TP)) + 
-  geom_point(aes(shape = pointSize)) + geom_line() + scale_shape_identity() +
-  geom_abline(slope = 1, intercept = 0, size = 1.5, color = 'grey') +
-  annotation_custom(tableGrob(aucTable, rows = NULL), xmin = .45, xmax = 1, ymin = 0, ymax = .45) +
-  labs(title="ROC Curves", x="False Positive Rate", y="True Positive Rate") +
-  plotTheme()+
-  theme(text = element_text(family = "Times New Roman", size = 12), 
-        plot.title = element_text(face = "bold", size = 14),
-        plot.subtitle = element_text(size = 12),
-        plot.caption = element_text(size = 8))
-```
 # Cross Validation
 
+Overall, our model 
 ```{r spatialcrossval, warning=FALSE, message=FALSE}
 acs.cv <- acs.hoods %>%
 left_join(baltimore_tracts)%>%
@@ -937,8 +920,13 @@ reg.spatialCV <- crossValidate(
   id = "GEOID",
   dependentVariable = "gentrify",
   indVariables = reg.vars)%>%
-select(GEOID, gentrify, Prediction)%>%
-mutate(error = Prediction - gentrify)
+select(GEOID, gentrify, Prediction)
+
+reg.summary <- reg.spatialCV %>%
+group_by(GEOID)%>%
+summarize(Mean_Error = mean(Prediction - , na.rm = T),
+              MAE = mean(abs(Mean_Error), na.rm = T),
+              SD_MAE = mean(abs(Mean_Error), na.rm = T))
 
 tm_shape(reg.spatialCV)+
 tm_polygons(col = "Prediction")
