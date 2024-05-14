@@ -385,11 +385,15 @@ Baltimore is less than an hour North of Annapolis, MD (the state capital) and Wa
 
 # Defining Gentrification
 
-We define our Gentrification Index per CT as follows:
+Gentrification has many different definitions and connotations. At least part of its definition is intangible: often one can simply "feel" when a neighborhood has gentrified. At a glance, the clues may be found in the presence of new construction trying especially hard to look older, or in the manifestation of high-priced coffee shops and their hipster patrons where there were none before. 
 
-GI = (∆ Low Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value)
+Because We define our Gentrification Index per CT as follows:
+
+<center> GI = (∆ Low Income Proportion) + (Percent Change of Rent) + (Percent Change of Home Value) </center>
 
 The change is calculated by subtracting the 2012 values from the 2022 values. If the change in proportion of high income residents is below 1, and the change in proportion of low income residents is above 1, then the equation would result in a negative number and would indicate that more poor residents have “moved” in - and would not indicate the occurrence of gentrification. If the change in proportion of high income residents is above 1, and the change in proportion of low income residents is below 1, then the equation would result in a positive number and would indicate that more wealthy residents have “moved” in - a key indicator of gentrification.
+
+We assume that if rent has increased between 2012 and 2022, that it will continue to increase, magnifying the gentrification of an area.
 
 ```{r callingincomedata, warning=FALSE, message=FALSE}
 #Getting population by Income numbers
@@ -619,8 +623,8 @@ ggplot() +
   xlim(-76.75, -76.48) +
   ylim(39.2, 39.38) +
   theme(legend.position = "bottom", legend.key.width = unit(1.5, "cm")) +
-  labs(fill = "Percent Change of Housing Units",
-       title = "2017 to 2022 Percent Change in Housing Units",
+  labs(fill = "Percent Change",
+       title = "2017 to 2022 Percent Change in Number of Housing Units",
        subtitle = "Baltimore City, MD")
 
 ```
